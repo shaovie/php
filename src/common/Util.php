@@ -11,8 +11,8 @@ class Util
     // 获取客户端IP
     public static function getIp()
     {
-        $ip = !empty($_SERVER["HTTP_VIA"]) ? $_SERVER["HTTP_X_FORWARDED_FOR"] : $_SERVER["REMOTE_ADDR"];
-        $ip = !empty($ip) ? $ip : $_SERVER["REMOTE_ADDR"];
+        $ip = !empty($_SERVER['HTTP_VIA']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
+        $ip = !empty($ip) ? $ip : $_SERVER['REMOTE_ADDR'];
         return $ip;
     }
 
