@@ -4,6 +4,7 @@
 -- bigint
 -- engine=InnoDB  or  engine=MyISAM
 
+-----------------------------------用户表-----------------------------------
 drop table if exists u_user;
 create table u_user (
     id                  int unsigned not null auto_increment comment 'id',
@@ -49,4 +50,46 @@ create table u_wx_user (
     index idx_user_id(`user_id`),
     unique key key_openid(`openid`)
 )engine=InnoDB default charset=utf8 comment='微信用户信息表';
+
+drop table if exists u_user_address;
+create table u_user_address (
+    id                  int unsigned not null auto_increment comment 'id',
+
+    user_id             int unsigned not null default 0 comment 'user id',
+
+    re_name             varchar(31) not null default '' comment '收件人姓名',
+    re_phone            char(11) not null default '' comment '收件人手机号',
+    addr_type           tinyint not null default 0 comment '地址类型 0:未知 1:公司 2:家庭',
+
+    province_id         int not null default 0 comment '省',
+    city_id             int not null default 0 comment '市',
+    district_id         int not null default 0 comment '区',
+    detail              varchar(255) not null default '' comment '详细街道地址',
+    re_id_card          varchar(18) not null default '' comment '收件人身份证',
+
+    is_default          tinyint not null default 0 comment '是否为默认地址 0/1',
+
+    ctime               int not null default 0 comment '创建时间',
+
+    primary key (`id`),
+    index idx_user_id(`user_id`)
+)engine=InnoDB default charset=utf8 comment='用户地址表';
+
+-----------------------------------系统内部表-----------------------------------
+drop table if exists s_address_table;
+create table s_address_table (
+    id                  int unsigned not null auto_increment comment 'id',
+
+    province_id         int not null default 0 comment '省',
+    province_name       varchar(31) not null default '' comment '省名',
+    city_id             int not null default 0 comment '市',
+    city_name           varchar(31) not null default '' comment '市名',
+    district_id         int not null default 0 comment '区',
+    district_name       varchar(31) not null default '' comment '区名',
+
+    ctime               int not null default 0 comment '创建时间',
+
+    primary key (`id`),
+    index idx_user_id(`user_id`)
+)engine=InnoDB default charset=utf8 comment='系统地址对照表';
 
