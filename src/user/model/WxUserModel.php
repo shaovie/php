@@ -11,13 +11,13 @@ user \src\common\Util;
 
 class WxUserModel
 {
-    public static function newWxUser($userId, $wxUserInfo)
+    public static function newWxUser($wxUserInfo)
     {
         if (empty($wxUserInfo)) {
             return false;
         }
         $data = array(
-            'user_id' => $userId,
+            'user_id' => 0,
             'openid' => $wxUserInfo['openid'],
             'nickname' => Util::emojiEncode((isset($wxUserInfo['nickname']) ? $wxUserInfo['nickname'] : '')),
             'sex' => isset($wxUserInfo['sex']) ? $wxUserInfo['sex'] : 0,

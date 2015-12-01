@@ -15,7 +15,7 @@ class SendMailController extends JobController
     public function send()
     {
         $failMap = array();
-        $ck = Cache::CK_ASYNC_EMAIL_QUEUE;
+        $ck = Nosql::NK_ASYNC_EMAIL_QUEUE;
         $beginTime = time();
 
         do {

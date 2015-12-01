@@ -103,7 +103,7 @@ HTML;
         }
 
         // 微信支付，看该用户是否关注过
-        $ck  = Cache::CK_WX_UNIFIED_PAY_UNSUBSCRIBE . $orderId;
+        $ck  = Nosql::NK_WX_UNIFIED_PAY_UNSUBSCRIBE . $orderId;
         $ret = Cache::get($ck);
     }
 

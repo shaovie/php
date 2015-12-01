@@ -51,7 +51,7 @@ class PayNotifyController extends PayController
 
         $transactionId = $data['transaction_id'];
 
-        $ck = Cache::CK_PAY_NOTIFY_DE_DUPLICATION . $data['out_trade_no'];
+        $ck = Nosql::NK_PAY_NOTIFY_DE_DUPLICATION . $data['out_trade_no'];
         $ck = Cache::get($ck);
         if (!empty($ck)) {
             echo '<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>';
@@ -63,7 +63,7 @@ class PayNotifyController extends PayController
                 $data['out_trade_no'], // 商户订单号
                 $data['total_fee'],    // 订单总金额
                 $data['cash_fee']) === true) { // 订单现金支付金额
-            Cache::setex($ck, Cache::CK_PAY_NOTIFY_DE_DUPLICATION_EXPIRE, 'x');
+            Cache::setex($ck, Nosql::NK_PAY_NOTIFY_DE_DUPLICATION_EXPIRE, 'x');
             echo '<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>';
             Log::pay('wexin unified pay notify success : ' . json_encode($data));
             return ;
@@ -116,7 +116,7 @@ class PayNotifyController extends PayController
             }
         }
 
-        $ck = Cache::CK_PAY_NOTIFY_DE_DUPLICATION . $data['out_trade_no'];
+        $ck = Nosql::NK_PAY_NOTIFY_DE_DUPLICATION . $data['out_trade_no'];
         $ck = Cache::get($ck);
         if (!empty($ck)) {
             Log::pay('ali wap pay notify success (had handled): ' . json_encode($_POST, JSON_UNESCAPED_UNICODE));
@@ -129,7 +129,7 @@ class PayNotifyController extends PayController
                     $_POST['out_trade_no'],
                     $_POST['total_fee'],
                     $_POST['total_fee']) === true) {
-                Cache::setex($ck, Cache::CK_PAY_NOTIFY_DE_DUPLICATION_EXPIRE, 'x');
+                Cache::setex($ck, Nosql::NK_PAY_NOTIFY_DE_DUPLICATION_EXPIRE, 'x');
                 Log::pay('ali wap pay notify success : ' . json_encode($_POST, JSON_UNESCAPED_UNICODE));
                 echo 'success';
                 return ;
@@ -150,8 +150,8 @@ class PayNotifyController extends PayController
     // 微信支付后，发现用户未支付
     private function onWxPayOkUnSubscribe($openid, $outTradeNo)
     {
-        $ck = Cache::CK_WX_UNIFIED_PAY_UNSUBSCRIBE . $outTradeNo;
-        Cache::setex($ck, Cache::CK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE, 'x');
+        $ck = Nosql::NK_WX_UNIFIED_PAY_UNSUBSCRIBE . $outTradeNo;
+        Cache::setex($ck, Nosql::NK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE, 'x');
     }
 }
 

@@ -39,8 +39,11 @@ define('DB_W_PASSWD',           $_SERVER['DB_W_PASSWD']);
 
 //= for redis
 define('CACHE_PREFIX',          $_SERVER['CACHE_PREFIX']);
-define('REDIS_HOST',            $_SERVER['REDIS_HOST']);
-define('REDIS_PORT',            $_SERVER['REDIS_PORT']);
+define('REDIS_CACHE_HOST',      $_SERVER['REDIS_CACHE_HOST']);
+define('REDIS_CACHE_PORT',      $_SERVER['REDIS_CACHE_PORT']);
+define('NOSQL_PREFIX',          $_SERVER['NOSQL_PREFIX']);
+define('REDIS_NOSQL_HOST',      $_SERVER['REDIS_NOSQL_HOST']);
+define('REDIS_NOSQL_PORT',      $_SERVER['REDIS_NOSQL_PORT']);
 
 //= weixin config
 const MAX_KF_MSG_LENGTH         = 2048;      // 微信客服消息最大允许长度

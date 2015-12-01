@@ -64,12 +64,12 @@ class Util
 
     public static function timeLimitFunction($ck, $expire, $func, $params)
     {
-        $ret = Cache::get($ck);
+        $ret = Nosql::get($ck);
         if (!empty($ret)) {
             return false;
         }
         if (call_user_func_array($func, $params)) {
-            Cache::setex($ck, $expire, 'x');
+            Nosql::setex($ck, $expire, 'x');
             return true;
         }
         return false;

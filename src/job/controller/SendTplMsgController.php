@@ -21,7 +21,7 @@ class SendTplMsgController extends JobController
     protected function run($idx)
     {
         $failMap = array();
-        $ck = Cache::CK_ASYNC_SEND_TPL_MSG_QUEUE . ':' . $idx;
+        $ck = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE . ':' . $idx;
         $beginTime = time();
 
         do {
