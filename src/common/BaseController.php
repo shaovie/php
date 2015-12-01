@@ -33,7 +33,7 @@ class BaseController
     }
 
     // 模板引用模块
-    final public function display($tplName, $data = array(), $isAbsoPath = false)
+    final public function display($tplName, $data = array(), $isAbsPath = false)
     {
         if (empty($tplName)) {
             return ;
@@ -43,7 +43,7 @@ class BaseController
             extract($data);
         }
 
-        if ($isAbsoPath) {
+        if ($isAbsPath) {
             $file = $tplName;
         } else {
             $file = SRC_PATH . '/' . $this->module . '/view/' . $tplName . '.php';

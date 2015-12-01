@@ -59,11 +59,6 @@ class PayNotifyController extends PayController
             return ;
         }
 
-        if ($data['is_subscribe'] == 'N'
-            && $data['trade_type'] == 'JSAPI') {
-            $this->onWxPayOkUnSubscribe($data['openid'], $data['out_trade_no']);
-        }
-
         if ($this->onPayNotifyOk(
                 $data['out_trade_no'], // 商户订单号
                 $data['total_fee'],    // 订单总金额
@@ -72,6 +67,11 @@ class PayNotifyController extends PayController
             echo '<xml><return_code>SUCCESS</return_code><return_msg>OK</return_msg></xml>';
             Log::pay('wexin unified pay notify success : ' . json_encode($data));
             return ;
+        }
+
+        if ($data['is_subscribe'] == 'N'
+            && $data['trade_type'] == 'JSAPI') {
+            $this->onWxPayOkUnSubscribe($data['openid'], $data['out_trade_no']);
         }
 
         echo '<xml><return_code>FAIL</return_code><return_msg>handle fail</return_msg></xml>';

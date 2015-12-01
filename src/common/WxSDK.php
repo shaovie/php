@@ -51,7 +51,8 @@ class WxSDK
     }
 
     // 静默登录非授权 获取用户 返回用户数据Array
-    public static function getUserInfo($openid, $scope, $accessToken)
+    // 如果scope 是 snsapi_userinfo模式，需要带上 accessToken参数
+    public static function getUserInfo($openid, $scope, $accessToken = '')
     {
         if ($scope == 'snsapi_base') {
             $accessToken = self::getAccessToken();
@@ -184,6 +185,9 @@ class WxSDK
     // send kefu message
     public static function sendKfTextMsg($openid, $msg)
     {
+        if (empty($openid) || empty($msg)) {
+            return true;
+        }
         $accessToken = self::getAccessToken();
         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $accessToken;
         $msg = '{"touser":"' . $openid . '",'
@@ -196,13 +200,16 @@ class WxSDK
         $ret = json_decode($ret, true);
         if (!empty($ret['errcode'])) {
             Log::warng('weixin - kf text msg error: ' . $ret['errmsg'] . ' msg=' . $msg);
-            return false;
+            return -1;
         }
         return true;
     }
 
     public static function sendKfNewsMsg($openid, $articles)
     {
+        if (empty($openid) || empty($articles)) {
+            return true;
+        }
         $accessToken = self::getAccessToken();
         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $accessToken;
         $msg = array(
@@ -218,7 +225,29 @@ class WxSDK
         $ret = json_decode($ret, true);
         if (!empty($ret['errcode'])) {
             Log::warng('weixin - kf news msg error: ' . $ret['errmsg'] . ' msg=' . $msg);
+            return -1;
+        }
+        return true;
+    }
+
+    public static function sendKfImageMsg($openid, $msg)
+    {
+        if (empty($openid) || empty($msg)) {
+            return true;
+        }
+        $accessToken = self::getAccessToken();
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $accessToken;
+        $msg = '{"touser":"' . $openid . '",'
+            . '"msgtype":"image",'
+            . '"image":{"media_id":"' . $msg . '"}';
+        $ret = HttpUtil::request($url, $msg, array('Content-Type: application/json'));
+        if ($ret === false) {
             return false;
+        }
+        $ret = json_decode($ret, true);
+        if (!empty($ret['errcode'])) {
+            Log::warng('weixin - kf image msg error: ' . $ret['errmsg'] . ' msg=' . $msg);
+            return -1;
         }
         return true;
     }
@@ -226,6 +255,9 @@ class WxSDK
     // send template message
     public static function sendTplMsg($msg/*raw json*/)
     {
+        if (empty($openid) || empty($msg)) {
+            return true;
+        }
         $accessToken = self::getAccessToken();
         $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $accessToken;
         $ret = HttpUtil::request($url, $msg, array('Content-Type: application/json'));
@@ -235,7 +267,7 @@ class WxSDK
         $ret = json_decode($ret, true);
         if (!empty($ret['errcode'])) {
             Log::warng('weixin - tpl msg error: ' . $ret['errmsg'] . ' msg=' . $msg);
-            return false;
+            return -1;
         }
         return true;
     }

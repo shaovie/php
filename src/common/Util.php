@@ -34,6 +34,9 @@ class Util
 
     public static function emojiEncode($str)
     {
+        if (empty($str)) {
+            return '';
+        }
         $length = mb_strlen($str, 'utf-8');
         $strEncode = '';
         for ($i = 0; $i < $length; $i++) {
@@ -49,6 +52,9 @@ class Util
 
     public static function emojiDecode($strEncode)
     {
+        if (empty($strEncode)) {
+            return '';
+        }
         $strDecode = preg_replace_callback("/\[\[EMJ:(.*?)\]\]/",
             function ($matches) { return rawurldecode($matches[1]); },
             $strEncode

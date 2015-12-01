@@ -42,11 +42,11 @@ class DB
         $this->passwd  = $passwd;
     }
 
-    // fetch_one('tb',
-    //          'c1,c2',
-    //          array('user', 'passwd'),
-    //          array($user, $passwd),
-    //          array('and'))
+    // fetchOne('tb',
+    //         'c1,c2',
+    //         array('user', 'passwd'),
+    //         array($user, $passwd),
+    //         array('and'))
     // select c1,c2 from tb where user='xx' and passwd='yy';
     //
     // return array('col' => val[, ...]) or false on failure

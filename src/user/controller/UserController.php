@@ -1,20 +1,20 @@
 <?php
 /**
  * @Author shaowei
- * @Date   2015-09-17
+ * @Date   2015-11-30
  */
 
-namespace src\weixin\controller;
+namespace src\user\controller;
 
 use \src\common\BaseController;
 
-class WeiXinController extends BaseController
+class UserController extends BaseController
 {
     public function __construct()
     {
         parent::__construct();
 
-        $this->module = 'weixin';
+        $this->module = 'user';
     }
 }
 

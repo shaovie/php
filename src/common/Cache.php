@@ -24,6 +24,8 @@ class Cache
     const CK_BAIDU_CITY_INFO      = 'baidu_city_info:';       // forever
     const CK_BAIDU_WX_GEOCONV     = 'baidu_wx_geoconv:';      // forever
 
+    //= for weixin
+
     //= for pay
     const CK_PAY_NOTIFY_DE_DUPLICATION  = 'pay_notify_de_duplication:';  const CK_PAY_NOTIFY_DE_DUPLICATION_EXPIRE= 86400;
     const CK_WX_UNIFIED_PAY_UNSUBSCRIBE = 'wx_unified_pay_unsubscribe:';  const CK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE = 86400;

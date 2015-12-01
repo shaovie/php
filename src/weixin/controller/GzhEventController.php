@@ -39,9 +39,8 @@ class GzhEventController extends WeiXinController
             exit();
         }
 
-        $data = file_get_contents("php://input");
+        $data = file_get_contents('php://input');
         $postObj = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
-        Log::rinfo(json_encode($postObj));
         $postData = json_decode(json_encode($postObj), true);
 
         switch ($postData['MsgType']) {
@@ -49,13 +48,18 @@ class GzhEventController extends WeiXinController
             $this->handleEvent($postData);
             break;
         case 'text':
-            $this->handleText($postData);
+            if (!$this->handleText($postData)) {
+                $this->transferToCustomerService($postData);
+            }
             break;
         case 'image':
-            $this->handleImage($postData);
-            break;
         case 'voice':
-            $this->handleVoice($postData);
+        case 'video':
+        case 'shortvideo':
+        case 'location':
+        case 'link':
+            EventModel::onActivateForGZH($openid);
+            $this->transferToCustomerService($postObj);
             break;
         }
         exit();
@@ -65,7 +69,7 @@ class GzhEventController extends WeiXinController
     private function handleEvent($postData)
     {
         if ($postData['Event'] == 'SCAN') { // 扫描二维码
-          $this->onScan($postData);
+            $this->onScan($postData);
         } elseif ($postData['Event'] == 'subscribe') { // 订阅
             $this->onSubscribe($postData);
         } elseif ($postData['Event'] == 'unsubscribe') { // 取消订阅
@@ -81,14 +85,8 @@ class GzhEventController extends WeiXinController
 
     private function handleText($postData)
     {
-        EventModel::onText($postData);
-    }
-
-    private function handleImage($postData)
-    {
-    }
-    private function handleVoice($postData)
-    {
+        EventModel::onActivateForGZH($openid);
+        return EventModel::onText($openid, $postData['Content']);
     }
 
     private function onScan($postData)
@@ -96,7 +94,9 @@ class GzhEventController extends WeiXinController
         $sceneId = $postData['EventKey'];
         $openid  = $postData['FromUserName'];
 
-        EventModel::onScan($openid);
+        EventModel::onScan($openid, $sceneId);
+
+        EventModel::onActivateForGZH($openid);
     }
 
     private function onSubscribe($postData)
@@ -104,9 +104,13 @@ class GzhEventController extends WeiXinController
         $openid = $postData['FromUserName'];
 
         if (strncmp($postData['EventKey'], 'qrscene_', 8) == 0) { // 扫描场景二维码的关注
-            $sceneId = (int)substr($postData['EventKey'], 8); 
+            $sceneId = intval(substr($postData['EventKey'], 8));
+            EventModel::onScanSubscribe($openid, $sceneId);
         } else { // 普通用户关注
+            EventModel::onSubscribe($openid);
         }
+
+        EventModel::onActivateForGZH($openid);
     }
 
     private function onUnsubscribe($postData)
@@ -124,10 +128,27 @@ class GzhEventController extends WeiXinController
     private function onView($postData)
     {
         $openid = $postData['FromUserName'];
+
+        EventModel::onActivateForGZH($openid);
     }
 
     private function onClick($postData)
     {
+        $openid = $postData['FromUserName'];
+
+        EventModel::onActivateForGZH($openid);
+    }
+
+    private function transferToCustomerService($postData)
+    {
+        $toUserName = $postData['ToUserName'];
+        $fromUserName = $postData['FromUserName'];
+        $now = CURRENT_TIME;
+        $msg = "<xml><ToUserName><![CDATA[$fromUserName]]></ToUserName>" 
+            . "<FromUserName><![CDATA[$toUserName]]></FromUserName>"
+            . "<CreateTime>$now</CreateTime><MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>";
+        echo $msg;
+        exit();
     }
 
     private function checkSignature()
