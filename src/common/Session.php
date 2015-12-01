@@ -4,7 +4,7 @@
  * @Date   2015-09-17
  */
 
-namespace Apps\Common;
+namespace src\common;
 
 class Session
 {
@@ -32,6 +32,18 @@ class Session
             self::$cookie['domain']
         );
         return $value;
+    }
+
+    public static function setUserSession(
+        $userId,
+        $openid
+    ) {
+        $data['userId'] = $userId;
+        $data['openid'] = $openid;
+        $data['userAgent'] = isset($_SERVER['HTTP_USER_AGENT']) ?
+            $_SERVER['HTTP_USER_AGENT'] : '';
+        $key = self::getSid();
+        Nosql::set(Nosql::NK_USER_SESSOIN . $key, json_encode($data));
     }
 }
 

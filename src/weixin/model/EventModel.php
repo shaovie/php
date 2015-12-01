@@ -50,7 +50,7 @@ class EventModel
     //
     private static function onSubscribeUser($openid, $from)
     {
-        $wxUserInfo = WxUserModel::findUser($openid);
+        $wxUserInfo = WxUserModel::findUserByOpenId($openid);
         if (empty($wxUserInfo)) {
             $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
             if (empty($wxUserInfo)) {

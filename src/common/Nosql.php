@@ -14,6 +14,7 @@ class Nosql
     // format   name1:[name2:]
     // 缓存KEY的前缀已经在Redis中配置过了，这里就不需要加了
     const NK_MONITOR_LOG_EXPIRE      = 'monitor_log_expire:'; const NK_MONITOR_LOG_EXPIRE = 1800;
+    const NK_USER_SESSOIN            = 'user_session:';       const NK_USER_SESSOIN_EXPIRE = 2592000;
 
     //= for pay
     const NK_PAY_NOTIFY_DE_DUPLICATION  = 'pay_notify_de_duplication:';

@@ -8,6 +8,13 @@ namespace src\common;
 
 class Util
 {
+    public static inWx()
+    {
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false;
+        }
+        return false;
+    }
     // 获取客户端IP
     public static function getIp()
     {

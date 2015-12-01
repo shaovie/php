@@ -33,7 +33,7 @@ class WxUserModel
         return DB::getDB('w')->insertOne('u_wx_user', $data);
     }
 
-    public static function findUser($openid)
+    public static function findUserByOpenId($openid)
     {
         if (empty($openid)) {
             return array();
