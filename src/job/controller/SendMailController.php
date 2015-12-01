@@ -1,27 +1,21 @@
 <?php
 /**
  * @Author shaowei
- * @Date   2015-11-30
+ * @Date   2015-12-01
  */
 
 namespace src\job\controller;
 
+use \src\common\SendMail;
 use \src\common\Cache;
-use \src\common\WxSDK;
 use \src\common\Log;
-use \src\job\model\AsyncModel;
 
-class SendKfMsgController extends JobController
+class SendMailController extends JobController
 {
     public function send()
     {
-        $this->spawnTask(AsyncModel::ASYNC_SEND_KF_MSG_QUEUE_SIZE);
-    }
-
-    protected function run($idx)
-    {
         $failMap = array();
-        $ck = Cache::CK_ASYNC_SEND_KF_MSG_QUEUE . ':' . $idx;
+        $ck = Cache::CK_ASYNC_EMAIL_QUEUE;
         $beginTime = time();
 
         do {
@@ -32,18 +26,9 @@ class SendKfMsgController extends JobController
                     break;
                 }
                 $data = json_decode($rawMsg, true);
-                $ret = -1;
-                if ($data['msgtype'] == 'text') {
-                    $ret = WxSDK::sendKfTextMsg($data['openid'], $data['content']);
-                } else if ($data['msgtype'] == 'image') {
-                    $ret = WxSDK::sendKfImageMsg($data['openid'], $data['content']);
-                } else if ($data['msgtype'] == 'news') {
-                    $news = $data['content'];
-                    $ret = WxSDK::sendKfNewsMsg($data['openid'], $news);
-                }
-
+                $ret = SendMail::sendmail($data['toList'], $data['title'], $data['desc']);
                 if ($ret === false) {
-                    $failKey = $data['msgid'];
+                    $failKey = $data['mailid'];
                     if (isset($failMap[$failKey])) {
                         if ($failMap[$failKey] > 2) {
                             continue ; // drop it
@@ -63,5 +48,8 @@ class SendKfMsgController extends JobController
             usleep(200000);
         } while (true);
     }
+
+    //= protected methods
+    protected function run($idx) {}
 }
 

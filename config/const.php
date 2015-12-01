@@ -8,9 +8,11 @@
  */
 
 //= defines
+define('EDITION',               isset($_SERVER['EDITION']) ? $_SERVER['EDITION'] : 'online');
 define('ROOT_PATH',             realpath(__DIR__ . '/../'));
 define('SRC_PATH',              ROOT_PATH . '/src');
 define('LOG_DIR',               ROOT_PATH . '/logs');
+define('LIBS_DIR',              ROOT_PATH . '/libs');
 define('CONFIG_PATH',           ROOT_PATH . '/config');
 define('PUBLIC_PATH',           ROOT_PATH . '/public');
 

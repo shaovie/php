@@ -146,7 +146,8 @@ class GzhEventController extends WeiXinController
         $now = CURRENT_TIME;
         $msg = "<xml><ToUserName><![CDATA[$fromUserName]]></ToUserName>" 
             . "<FromUserName><![CDATA[$toUserName]]></FromUserName>"
-            . "<CreateTime>$now</CreateTime><MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>";
+            . "<CreateTime>$now</CreateTime>"
+            . "<MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>";
         echo $msg;
         exit();
     }

@@ -13,16 +13,17 @@ class Cache
     //= define keys
     // format   name1:[name2:]
     // 缓存KEY的前缀已经在Redis中配置过了，这里就不需要加了
-    const CK_WX_ACCESS_TOKEN      = 'wx_access_token:';        // expire probably 7200-300
-    const CK_WX_JSAPI_TICKET      = 'wx_jsapi_ticket:';        // expire probably 7200-300
-    const CK_SHORT_URL            = 'short_url:';              // forever
-    const CK_WX_SCENE_QRCODE      = 'wx_scene_qrcode:'; const CK_WX_SCENE_QRCODE_EXPIRE = 1800;
+    const CK_WX_ACCESS_TOKEN         = 'wx_access_token:';        // expire probably 7200-300
+    const CK_WX_JSAPI_TICKET         = 'wx_jsapi_ticket:';        // expire probably 7200-300
+    const CK_SHORT_URL               = 'short_url:';              // forever
+    const CK_WX_SCENE_QRCODE         = 'wx_scene_qrcode:';    const CK_WX_SCENE_QRCODE_EXPIRE = 1800;
+    const CK_MONITOR_LOG_EXPIRE      = 'monitor_log_expire:'; const CK_MONITOR_LOG_EXPIRE = 1800;
 
     // baidu
-    const CK_BAIDU_IP_TO_LOCATION = 'baidu_ip2location:';     // forever
-    const CK_BAIDU_LAT_LNG_TO_ADDR= 'baidu_lat_lng_2_addr:';  // forever
-    const CK_BAIDU_CITY_INFO      = 'baidu_city_info:';       // forever
-    const CK_BAIDU_WX_GEOCONV     = 'baidu_wx_geoconv:';      // forever
+    const CK_BAIDU_IP_TO_LOCATION    = 'baidu_ip2location:';     // forever
+    const CK_BAIDU_LAT_LNG_TO_ADDR   = 'baidu_lat_lng_2_addr:';  // forever
+    const CK_BAIDU_CITY_INFO         = 'baidu_city_info:';       // forever
+    const CK_BAIDU_WX_GEOCONV        = 'baidu_wx_geoconv:';      // forever
 
     //= for weixin
 
