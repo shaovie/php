@@ -62,14 +62,14 @@ class Util
         return $strDecode;
     }
 
-    public static function timeLimitFunction($ck, $expire, $func, $params)
+    public static function timeLimitFunction($nk, $expire, $func, $params)
     {
-        $ret = Nosql::get($ck);
+        $ret = Nosql::get($nk);
         if (!empty($ret)) {
             return false;
         }
         if (call_user_func_array($func, $params)) {
-            Nosql::setex($ck, $expire, 'x');
+            Nosql::setex($nk, $expire, 'x');
             return true;
         }
         return false;

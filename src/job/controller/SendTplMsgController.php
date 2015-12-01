@@ -6,7 +6,7 @@
 
 namespace src\job\Controller;
 
-use \src\common\Cache;
+use \src\common\Nosql;
 use \src\common\WxSDK;
 use \src\common\Log;
 use \src\job\model\AsyncModel;
@@ -21,12 +21,12 @@ class SendTplMsgController extends JobController
     protected function run($idx)
     {
         $failMap = array();
-        $ck = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE . ':' . $idx;
+        $nk = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE . ':' . $idx;
         $beginTime = time();
 
         do {
             do {
-                $rawMsg = Cache::lPop($ck);
+                $rawMsg = Nosql::lPop($nk);
                 if ($rawMsg === false
                     || !isset($rawMsg[0])) {
                     break;
@@ -40,10 +40,10 @@ class SendTplMsgController extends JobController
                             continue ; // drop it
                         }
                         $failMap[$failKey] = $failMap[$failKey] + 1;
-                        Cache::lPush($ck, $rawMsg);
+                        Nosql::lPush($nk, $rawMsg);
                     } else {
                         $failMap[$failKey] = 1;
-                        Cache::lPush($ck, $rawMsg);
+                        Nosql::lPush($nk, $rawMsg);
                     }
                 }
             } while (true);

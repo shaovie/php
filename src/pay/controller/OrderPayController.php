@@ -8,7 +8,7 @@ namespace src\pay\controller;
 
 use \src\common\WxSDK;
 use \src\common\AliSDK;
-use \src\common\Cache;
+use \src\common\Nosql;
 use \src\common\Util;
 use \src\common\Log;
 use \src\pay\model\PayModel;
@@ -103,8 +103,8 @@ HTML;
         }
 
         // 微信支付，看该用户是否关注过
-        $ck  = Nosql::NK_WX_UNIFIED_PAY_UNSUBSCRIBE . $orderId;
-        $ret = Cache::get($ck);
+        $nk  = Nosql::NK_WX_UNIFIED_PAY_UNSUBSCRIBE . $orderId;
+        $ret = Nosql::get($nk);
     }
 
     public function aliPay()

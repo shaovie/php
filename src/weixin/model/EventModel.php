@@ -6,7 +6,6 @@
 
 namespace src\weixin\model;
 
-user \src\common\Cache;
 user \src\common\WxSDK;
 user \src\user\model\WxUserModel;
 

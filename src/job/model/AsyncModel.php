@@ -6,7 +6,7 @@
 
 namespace src\user\model;
 
-user \src\common\Cache;
+user \src\common\Nosql;
 user \src\common\Util;
 
 class AsyncModel
@@ -20,14 +20,14 @@ class AsyncModel
         if (EDITION != 'online') {
             return ;
         }
-        $ck  = Nosql::NK_MONITOR_LOG . $title . ':' . $desc;
-        $ret = Cache::get($ck);
+        $nk  = Nosql::NK_MONITOR_LOG . $title . ':' . $desc;
+        $ret = Nosql::get($nk);
         if ($ret !== false) {
             return ;
         }
-        Cache::setex($ck, Nosql::NK_MONITOR_LOG_EXPIRE, 'x');
+        Nosql::setex($nk, Nosql::NK_MONITOR_LOG_EXPIRE, 'x');
 
-        $ck = Nosql::NK_ASYNC_EMAIL_QUEUE;
+        $nk = Nosql::NK_ASYNC_EMAIL_QUEUE;
         $data = array(
             'toList' => array(
                 'xxx@xx.com',
@@ -36,7 +36,7 @@ class AsyncModel
             'desc'   => $desc,
             'mailid' => Util::getRandomStr(16),
         );
-        Cache::rPush($ck, json_encode($data));
+        Nosql::rPush($nk, json_encode($data));
     }
 
     public static function asyncSendTplMsg($openid, $data)
@@ -44,9 +44,9 @@ class AsyncModel
         if (empty($openid)) {
             return ;
         }
-        $ck = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE . ':'
+        $nk = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE . ':'
             . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_TPL_MSG_QUEUE_SIZE);
-        Cache::rPush($ck, json_encode($data, JSON_UNESCAPED_UNICODE));
+        Nosql::rPush($nk, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
     public static function asyncSendKfMsg($openid, $msgtype, $content)
@@ -60,9 +60,9 @@ class AsyncModel
             'content' => $content,
             'msgid' => Util::getRandomStr(16),
         );
-        $ck = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE . ':'
+        $nk = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE . ':'
             . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_KF_MSG_QUEUE_SIZE);
-        Cache::rPush($ck, json_encode($data));
+        Nosql::rPush($nk, json_encode($data));
     }
 
     public static function asyncSendSms($phone, $content)
@@ -74,9 +74,9 @@ class AsyncModel
             'phone'   => $phone,
             'content' => $desc,
         );
-        $ck = Nosql::NK_ASYNC_SMS_QUEUE . ':'
+        $nk = Nosql::NK_ASYNC_SMS_QUEUE . ':'
             . (abs(Util::ascIIStrToInt($phone)) % ASYNC_SEND_SMS_QUEUE_SIZE);
-        Cache::rPush($ck, json_encode($data));
+        Nosql::rPush($nk, json_encode($data));
     }
 }
 

@@ -7,7 +7,7 @@
 namespace src\job\controller;
 
 use \src\common\SMS;
-use \src\common\Cache;
+use \src\common\Nosql;
 use \src\common\Log;
 
 class SendSMSController extends JobController
@@ -20,12 +20,12 @@ class SendSMSController extends JobController
 
     protected function run($idx)
     {
-        $ck = Nosql::NK_ASYNC_SMS_QUEUE . ':' . $idx;
+        $nk = Nosql::NK_ASYNC_SMS_QUEUE . ':' . $idx;
         $beginTime = time();
 
         do {
             do {
-                $rawMsg = Cache::lPop($ck);
+                $rawMsg = Nosql::lPop($nk);
                 if ($rawMsg === false
                     || !isset($rawMsg[0])) {
                     break;

@@ -7,7 +7,7 @@
 namespace src\job\controller;
 
 use \src\common\SendMail;
-use \src\common\Cache;
+use \src\common\Nosql;
 use \src\common\Log;
 
 class SendMailController extends JobController
@@ -15,12 +15,12 @@ class SendMailController extends JobController
     public function send()
     {
         $failMap = array();
-        $ck = Nosql::NK_ASYNC_EMAIL_QUEUE;
+        $nk = Nosql::NK_ASYNC_EMAIL_QUEUE;
         $beginTime = time();
 
         do {
             do {
-                $rawMsg = Cache::lPop($ck);
+                $rawMsg = Nosql::lPop($nk);
                 if ($rawMsg === false
                     || !isset($rawMsg[0])) {
                     break;
@@ -34,10 +34,10 @@ class SendMailController extends JobController
                             continue ; // drop it
                         }
                         $failMap[$failKey] = $failMap[$failKey] + 1;
-                        Cache::lPush($ck, $rawMsg);
+                        Nosql::lPush($nk, $rawMsg);
                     } else {
                         $failMap[$failKey] = 1;
-                        Cache::lPush($ck, $rawMsg);
+                        Nosql::lPush($nk, $rawMsg);
                     }
                 }
             } while (true);

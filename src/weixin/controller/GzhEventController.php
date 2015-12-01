@@ -6,7 +6,6 @@
 
 namespace src\weixin\controller;
 
-use \src\common\Cache;
 use \src\common\Log;
 use \src\common\WxSDK;
 use \src\common\Util;
