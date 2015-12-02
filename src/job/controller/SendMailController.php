@@ -42,7 +42,7 @@ class SendMailController extends JobController
                 }
             } while (true);
 
-            if (time() - $beginTime > 30) {
+            if (time() - $beginTime > 30) { // 30秒脚本重新执行一次
                 break;
             }
             usleep(200000);

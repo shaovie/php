@@ -29,6 +29,8 @@ class Cache
     //= for user
     const CK_USER_ADDR_LIST          = 'user_addr_list:';        // forever
 
+    const CK_MONITOR_LOG             = 'monitor_log:'; const CK_MONITOR_LOG_EXPIRE = 60;
+
     //= public static methods
     //
     private static function getCache()

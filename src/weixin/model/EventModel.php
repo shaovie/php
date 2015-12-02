@@ -43,22 +43,14 @@ class EventModel
     // 相对于公众号活跃（针对48小时内的客服消息）
     public static function onActivateForGZH($openid)
     {
-        WxUserModel::onActivateForGZH($openid);
+        AsyncModel::asyncDBOpt('activate_for_gzh', array('openid' => $openid));
     }
 
     //= private method
-    //
-    private static function onSubscribeUser($openid, $from)
+    private static function onUserSubscribe($openid, $from)
     {
-        $wxUserInfo = WxUserModel::findUserByOpenId($openid);
-        if (empty($wxUserInfo)) {
-            $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
-            if (empty($wxUserInfo)) {
-                Log::warng('get wx:' . $openid . ' userinfo fail where on ' . $from);
-            } else {
-                WxUserModel::newWxUser($wxUserInfo);
-            }
-        }
+        // 异步创建微信用户或更新用户信息
+        AsyncModel::asyncSubscribe($openid, $from);
     }
 
     private static function onSceneQrCode($openid, $sceneId)

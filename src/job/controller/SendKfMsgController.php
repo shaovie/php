@@ -21,7 +21,7 @@ class SendKfMsgController extends JobController
     protected function run($idx)
     {
         $failMap = array();
-        $nk = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE . ':' . $idx;
+        $nk = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE . $idx;
         $beginTime = time();
 
         do {
@@ -57,7 +57,7 @@ class SendKfMsgController extends JobController
                 }
             } while (true);
 
-            if (time() - $beginTime > 30) {
+            if (time() - $beginTime > 30) { // 30秒脚本重新执行一次
                 break;
             }
             usleep(200000);

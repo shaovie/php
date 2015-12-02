@@ -33,6 +33,58 @@ class WxUserModel
         return DB::getDB('w')->insertOne('u_wx_user', $data);
     }
 
+    public static function updateWxUserInfo($openid, $userInfo, $wxUserInfo)
+    {
+        if (empty($openid) || empty($wxUserInfo) || empty($userInfo)
+            return false;
+        }
+
+        $data = array();
+        if (isset($wxUserInfo['nickname'])
+            && $userInfo['nickname'] != $wxUserInfo['nickname']) {
+            $data['nickname'] = Util::emojiEncode($wxUserInfo['nickname']);
+        }
+        if (isset($wxUserInfo['sex'])
+            && $userInfo['sex'] != $wxUserInfo['sex']) {
+            $data['sex'] = $wxUserInfo['sex'];
+        }
+        if (isset($wxUserInfo['headimgurl'])
+            && $userInfo['headimgurl'] != $wxUserInfo['headimgurl']) {
+            $data['headimgurl'] = $wxUserInfo['headimgurl'];
+        }
+        if (isset($wxUserInfo['province'])
+            && $userInfo['province'] != $wxUserInfo['province']) {
+            $data['province'] = $wxUserInfo['province'];
+        }
+        if (isset($wxUserInfo['city'])
+            && $userInfo['city'] != $wxUserInfo['city']) {
+            $data['city'] = $wxUserInfo['city'];
+        }
+        if (isset($wxUserInfo['subscribe'])
+            && $userInfo['subscribe'] != $wxUserInfo['subscribe']) {
+            $data['subscribe'] = $wxUserInfo['subscribe'];
+        }
+        if (isset($wxUserInfo['subscribe_time'])
+            && $userInfo['subscribe_time'] != $wxUserInfo['subscribe_time']) {
+            $data['subscribe_time'] = $wxUserInfo['subscribe_time'];
+        }
+        if (isset($wxUserInfo['unionid'])
+            && $userInfo['unionid'] != $wxUserInfo['unionid']) {
+            $data['unionid'] = $wxUserInfo['unionid'];
+        }
+
+        if (empty($data)) {
+            return true;
+        }
+
+        $ret = DB::getDB('w')->update(
+            'u_wx_user',
+            $data,
+            array('openid'), array($openid)
+        );
+        return $ret !== false;
+    }
+
     public static function findUserByOpenId($openid)
     {
         if (empty($openid)) {
@@ -51,6 +103,9 @@ class WxUserModel
 
     public static function onActivateForGZH($openid)
     {
+        if (empty($openid)) {
+            return ;
+        }
         $ret = DB::getDB('w')->update(
             'u_wx_user',
             array('atime' => CURRENT_TIME),
