@@ -11,8 +11,7 @@ user \src\common\Util;
 
 class AsyncModel
 {
-    const ASYNC_SEND_KF_MSG_QUEUE_SIZE  = 2;
-    const ASYNC_SEND_TPL_MSG_QUEUE_SIZE = 2;
+    const ASYNC_SEND_WX_MSG_QUEUE_SIZE  = 3;
     const ASYNC_SEND_SMS_QUEUE_SIZE     = 2;
     const ASYNC_WX_EVENT_QUEUE_SIZE     = 2;
     const ASYNC_DB_OPT_QUEUE_SIZE       = 2;
@@ -41,13 +40,18 @@ class AsyncModel
         Nosql::rPush($nk, json_encode($data));
     }
 
-    public static function asyncSendTplMsg($openid, $data)
+    public static function asyncSendTplMsg($openid, $msg)
     {
-        if (empty($openid)) {
+        if (empty($openid) || empty($msg)) {
             return ;
         }
-        $nk = Nosql::NK_ASYNC_SEND_TPL_MSG_QUEUE
-            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_TPL_MSG_QUEUE_SIZE) . ':';
+        $data = array(
+            'msgtype' => 'tpl',
+            'msgid' => Util::getRandomStr(16),
+            'data' => $msg,
+        );
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE
+            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_WX_MSG_QUEUE_SIZE) . ':';
         Nosql::rPush($nk, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
@@ -57,13 +61,16 @@ class AsyncModel
             return ;
         }
         $data = array(
-            'openid' => $openid,
-            'msgtype' => $msgtype,
-            'content' => $content,
+            'msgtype' => 'kf',
             'msgid' => Util::getRandomStr(16),
+            'data' => array(
+                'openid' => $openid,
+                'msgtype' => $msgtype,
+                'content' => $content,
+            ),
         );
-        $nk = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE
-            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_KF_MSG_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE
+            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_WX_MSG_QUEUE_SIZE) . ':';
         Nosql::rPush($nk, json_encode($data));
     }
 

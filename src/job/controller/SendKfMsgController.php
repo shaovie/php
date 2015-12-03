@@ -11,17 +11,17 @@ use \src\common\WxSDK;
 use \src\common\Log;
 use \src\job\model\AsyncModel;
 
-class SendKfMsgController extends JobController
+class SendWxMsgController extends JobController
 {
     public function send()
     {
-        $this->spawnTask(AsyncModel::ASYNC_SEND_KF_MSG_QUEUE_SIZE);
+        $this->spawnTask(AsyncModel::ASYNC_SEND_WX_MSG_QUEUE_SIZE);
     }
 
     protected function run($idx)
     {
         $failMap = array();
-        $nk = Nosql::NK_ASYNC_SEND_KF_MSG_QUEUE . $idx;
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE . $idx;
         $beginTime = time();
 
         do {
@@ -32,16 +32,7 @@ class SendKfMsgController extends JobController
                     break;
                 }
                 $data = json_decode($rawMsg, true);
-                $ret = -1;
-                if ($data['msgtype'] == 'text') {
-                    $ret = WxSDK::sendKfTextMsg($data['openid'], $data['content']);
-                } else if ($data['msgtype'] == 'image') {
-                    $ret = WxSDK::sendKfImageMsg($data['openid'], $data['content']);
-                } else if ($data['msgtype'] == 'news') {
-                    $news = $data['content'];
-                    $ret = WxSDK::sendKfNewsMsg($data['openid'], $news);
-                }
-
+                $ret = $this->processMsg($data);
                 if ($ret === false) {
                     $failKey = $data['msgid'];
                     if (isset($failMap[$failKey])) {
@@ -62,6 +53,39 @@ class SendKfMsgController extends JobController
             }
             usleep(200000);
         } while (true);
+    }
+
+    private function processMsg($data)
+    {
+        switch ($data['msgtype']) {
+        case 'tpl':
+            return $this->sendTplMsg($data['data']);
+            break;
+        case 'kf':
+            return $this->sendKfMsg($data['data']);
+            break;
+        }
+        return true;
+    }
+
+    private function sendTplMsg($data)
+    {
+        $msg = json_encode($data, JSON_UNESCAPED_UNICODE);
+        return WxSDK::sendTplMsg($msg);
+    }
+
+    private function sendKfMsg($data)
+    {
+        $ret = true;
+        if ($data['msgtype'] == 'text') {
+            $ret = WxSDK::sendKfTextMsg($data['openid'], $data['content']);
+        } else if ($data['msgtype'] == 'image') {
+            $ret = WxSDK::sendKfImageMsg($data['openid'], $data['content']);
+        } else if ($data['msgtype'] == 'news') {
+            $news = $data['content'];
+            $ret = WxSDK::sendKfNewsMsg($data['openid'], $news);
+        }
+        return $ret;
     }
 }
 
