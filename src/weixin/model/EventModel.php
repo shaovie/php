@@ -8,6 +8,7 @@ namespace src\weixin\model;
 
 user \src\common\WxSDK;
 user \src\user\model\WxUserModel;
+user \src\job\model\AsyncModel;
 
 class EventModel
 {
@@ -43,6 +44,12 @@ class EventModel
     // 相对于公众号活跃（针对48小时内的客服消息）
     public static function onActivateForGZH($openid)
     {
+        $nk = Nosql::NK_ACTIVATE_FOR_GZH . $openid;
+        $ret = Nosql::get($nk);
+        if (!empty($ret)) {
+            return ;
+        }
+        Nosql::setex($nk, Nosql::NK_ACTIVATE_FOR_GZH_EXPIRE, 'x');
         AsyncModel::asyncDBOpt('activate_for_gzh', array('openid' => $openid));
     }
 

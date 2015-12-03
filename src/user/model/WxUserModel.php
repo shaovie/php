@@ -82,6 +82,7 @@ class WxUserModel
             $data,
             array('openid'), array($openid)
         );
+        Cache::del(Cache::CK_WX_USER_INFO . $openid);
         return $ret !== false;
     }
 
@@ -90,10 +91,20 @@ class WxUserModel
         if (empty($openid)) {
             return array();
         }
-        $ret = DB::getDB()->fetchOne(
-            'u_wx_user',
-            array('openid'), array($openid),
-        );
+
+        $ck = Cache::CK_WX_USER_INFO . $openid;
+        $ret = Cache::get($ck);
+        if ($ret !== false) {
+            $ret = json_decode($ret, true);
+        } else {
+            $ret = DB::getDB()->fetchOne(
+                'u_wx_user',
+                array('openid'), array($openid),
+            );
+            if ($ret !== false) {
+                Cache::set($ck, json_encode($ret));
+            }
+        }
         if (empty($ret)) {
             return array();
         }
@@ -111,6 +122,7 @@ class WxUserModel
             array('atime' => CURRENT_TIME),
             array('openid'), array($openid)
         );
+        Cache::del(Cache::CK_WX_USER_INFO . $openid);
     }
 }
 

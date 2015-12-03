@@ -23,7 +23,7 @@ class Nosql
     const NK_WX_UNIFIED_PAY_UNSUBSCRIBE = 'wx_unified_pay_unsubscribe:';
     const NK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE = 86400;
 
-    //=async job queue
+    //= async job queue
     const NK_MONITOR_LOG             = 'monitor_log:';
     const NK_ASYNC_EMAIL_QUEUE       = 'async_email_queue:';
     const NK_ASYNC_WX_EVENT_QUEUE    = 'async_wx_event_queue:';
@@ -31,6 +31,9 @@ class Nosql
     const NK_ASYNC_SMS_QUEUE         = 'async_sms_queue:';
     const NK_ASYNC_DB_OPT_QUEUE      = 'async_db_opt_queue:';
     
+    //= for weixin
+    const NK_ACTIVATE_FOR_GZH        = 'activate_for_gzh:'; const NK_ACTIVATE_FOR_GZH_EXPIRE = 120;
+
     //= public static methods
     //
     private static function getNosql()

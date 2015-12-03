@@ -20,8 +20,8 @@ class UserAddressModel
         $cityId,
         $districtId,
         $detailAddr,
-        $reIdCard    // 身份证
-        $isDefault,
+        $reIdCard,   // 身份证
+        $isDefault
     ) {
         if (empty($userId)) {
             return false;

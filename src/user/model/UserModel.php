@@ -49,10 +49,19 @@ class UserModel
         if (empty($userId)) {
             return array();
         }
-        $ret = DB::getDB()->fetchOne(
-            'u_user',
-            array('id'), array($userId),
-        );
+        $ck = Cache::CK_USER_INFO_FOR_ID . $userId;
+        $ret = Cache::get($ck);
+        if ($ret !== false) {
+            $ret = json_decode($ret, true);
+        } else {
+            $ret = DB::getDB()->fetchOne(
+                'u_user',
+                array('id'), array($userId),
+            );
+            if ($ret !== false) {
+                Cache::set($ck, json_encode($ret));
+            }
+        }
         if (empty($ret)) {
             return array();
         }
@@ -65,10 +74,19 @@ class UserModel
         if (empty($phone)) {
             return array();
         }
-        $ret = DB::getDB()->fetchOne(
-            'u_user',
-            array('phone'), array($phone),
-        );
+        $ck = Cache::CK_USER_INFO_FOR_PHONE . $phone;
+        $ret = Cache::get($ck);
+        if ($ret !== false) {
+            $ret = json_decode($ret, true);
+        } else {
+            $ret = DB::getDB()->fetchOne(
+                'u_user',
+                array('phone'), array($phone),
+            );
+            if ($ret !== false) {
+                Cache::set($ck, json_encode($ret));
+            }
+        }
         if (empty($ret)) {
             return array();
         }

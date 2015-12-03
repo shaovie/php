@@ -59,9 +59,10 @@ class WxEventAsyncController extends JobController
     {
         $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
         if (empty($wxUserInfo)) {
+            Log::warng('first get wx:' . $openid . ' userinfo fail from ' . $from);
             $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
             if (empty($wxUserInfo)) {
-                Log::warng('get wx:' . $openid . ' userinfo fail where on ' . $from);
+                Log::warng('second get wx:' . $openid . ' userinfo fail from ' . $from);
                 return false;
             }
         }
