@@ -31,13 +31,13 @@ class EventModel
     // 普通关注
     public static function onSubscribe($openid)
     {
-        self::onUserSubscribe($openid, 'subscribe');
+        self::onUserSubscribe($openid, WxUserModel::SUBSCRIBE_FROM_COMMON);
     }
 
     // 扫码关注
     public static function onScanSubscribe($openid, $sceneId)
     {
-        self::onUserSubscribe($openid, 'scansubscribe');
+        self::onUserSubscribe($openid, WxUserModel::SUBSCRIBE_FROM_SCAN_SCENE_CODE);
         self::onSceneQrCode($openid, $sceneId);
     }
 

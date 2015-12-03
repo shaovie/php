@@ -37,6 +37,7 @@ create table u_wx_user (
     city                varchar(60) not null default '' comment '市',
     subscribe           tinyint not null default 0 comment '是否关注 0/1',
     subscribe_time      int not null default 0 comment '关注时间(取最后一次关注)',
+    subscribe_from      tinyint not null default 0 comment '关注方式(仅记首次) 1:已经关注 2:普通关注 3:场景二维码',
     unionid             varchar(63) not null default '' comment '腾讯平台唯一ID',
     lng                 decimal(12,8) not null default '0.0' comment '经度180.12345678',
     lat                 decimal(12,8) not null default '0.0' comment '纬度180.12345678',

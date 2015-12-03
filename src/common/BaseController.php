@@ -56,5 +56,21 @@ class BaseController
         }
         return ;
     }
+
+    protected function ajaxReturn($code, $msg, $url = '', $result = array())
+    {
+        $data['code'] = $code;
+        $data['msg'] = $msg;
+        $data['url'] = $url;
+        $data['result'] = $result;
+        $callback = empty($_GET['callback']) ? false : $_GET['callback'];
+        $data = json_encode($data);
+        if(!empty($callback)) {
+            echo $callback . '(' . $data . ')';
+        } else {
+            echo $data;
+        }
+        return ;
+    }
 }
 

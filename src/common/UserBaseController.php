@@ -34,9 +34,9 @@ class UserBaseController extends BaseController
             $userInfo = json_decode($userInfo, true);
             if ($userInfo['userAgent'] == $userAgent) {
                 if (Util::inWx()) {
-                    return $this->loginInWx($userInfo['openid']);
+                    return $this->doLoginInWx($userInfo['openid']);
                 } else {
-                    return $this->loginDefault($userInfo['userId']);
+                    return $this->doLoginDefault($userInfo['userId']);
                 }
             }
         }
@@ -48,7 +48,7 @@ class UserBaseController extends BaseController
         return empty($this->userInfo['id']);
     }
 
-    public function loginInWx($openid)
+    public function doLoginInWx($openid)
     {
         $this->wxUserInfo = WxUserModel::findUserByOpenId($openid);
         if (!empty($this->wxUserInfo)) {
@@ -57,7 +57,7 @@ class UserBaseController extends BaseController
         return empty($this->wxUserInfo);
     }
 
-    public function loginDefault($userId)
+    public function doLoginDefault($userId)
     {
         $this->userInfo = UserModel::findUserById($userId);
         return empty($this->userInfo);
@@ -66,11 +66,13 @@ class UserBaseController extends BaseController
     public function toLogin()
     {
         if (Util::inWx()) {
-            $this->wxLogin();
+            $this->toWxLogin();
+        } else {
+            $this->toDefaultLogin();
         }
     }
 
-    public function wxLogin()
+    public function toWxLogin()
     {
         $openInfo = WxSDK::getOpenInfo('snsapi_base', WX_APP_ID, WX_APP_SECRET);
         if (empty($openInfo['openid'])) {
@@ -78,8 +80,10 @@ class UserBaseController extends BaseController
         }
         $wxUserInfo = WxSDK::getUserInfo($openInfo['openid'], 'snsapi_base');
         if (empty($wxUserInfo)) { //
+            Log::warng('first get wxuinfo:' . $openInfo['openid'] . ' fail when autologin');
             $wxUserInfo = WxSDK::getUserInfo($openInfo['openid'], 'snsapi_base');
             if (empty($wxUserInfo)) { //
+                Log::warng('second get wxuinfo:' . $openInfo['openid'] . ' fail when autologin');
                 return ;
             }
         }
@@ -89,7 +93,11 @@ class UserBaseController extends BaseController
             $this->wxUserInfo = $ret;
             return ;
         } else { // create one
-            $ret = WxUserModel::newWxUser($wxUserInfo);
+            $from = WxUserModel::SUBSCRIBE_FROM_ALREADY;
+            if ((int)$wxUserInfo['subscribe'] == 0) {
+                $from = WxUserModel::SUBSCRIBE_FROM_UNSUBSCRIBE;
+            }
+            $ret = WxUserModel::newWxUser($wxUserInfo, $from);
             if ($ret === false) {
                 return ;
             }
@@ -103,6 +111,11 @@ class UserBaseController extends BaseController
                 Log::error("create wx user fail! " . json_encode($wxUserInfo, JSON_UNESCAPED_UNICODE));
             }
         }
+    }
+
+    public function toDefaultLogin()
+    {
+        header('Location: /user/Login');
     }
 }
 

@@ -6,7 +6,7 @@
 
 namespace src\mall\controller;
 
-use \src\common\BaseController;
+use \src\common\UserBaseController;
 
 class MallController extends UserBaseController
 {

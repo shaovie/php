@@ -52,6 +52,7 @@ class WxEventAsyncController extends JobController
             break;
         default:
             Log::error('wx event async job: unknow event');
+            break;
         }
     }
 
@@ -59,19 +60,19 @@ class WxEventAsyncController extends JobController
     {
         $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
         if (empty($wxUserInfo)) {
-            Log::warng('first get wx:' . $openid . ' userinfo fail from ' . $from);
+            Log::warng('first get wxuinfo:' . $openid . ' userinfo fail from ' . $from);
             $wxUserInfo = WxSDK::getUserInfo($openid, 'snsapi_base');
             if (empty($wxUserInfo)) {
-                Log::warng('second get wx:' . $openid . ' userinfo fail from ' . $from);
+                Log::warng('second get wxuinfo:' . $openid . ' userinfo fail from ' . $from);
                 return false;
             }
         }
 
         $userInfo = WxUserModel::findUserByOpenId($openid);
         if (empty($userInfo)) {
-            WxUserModel::newWxUser($wxUserInfo);
+            WxUserModel::newWxUser($wxUserInfo, $from);
         } else {
-            WxUserModel::updateWxUserInfo($userInfo, $wxUserInfo);
+            WxUserModel::updateWxUserInfo($userInfo, $wxUserInfo, $from);
         }
     }
 }

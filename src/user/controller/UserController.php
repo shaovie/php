@@ -6,9 +6,9 @@
 
 namespace src\user\controller;
 
-use \src\common\BaseController;
+use \src\common\UserBaseController;
 
-class UserController extends BaseController
+class UserController extends UserBaseController
 {
     public function __construct()
     {
