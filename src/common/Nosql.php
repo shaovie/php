@@ -27,8 +27,7 @@ class Nosql
     const NK_MONITOR_LOG             = 'monitor_log:';
     const NK_ASYNC_EMAIL_QUEUE       = 'async_email_queue:';
     const NK_ASYNC_WX_EVENT_QUEUE    = 'async_wx_event_queue:';
-    const NK_ASYNC_SEND_TPL_MSG_QUEUE= 'async_wx_event_queue:';
-    const NK_ASYNC_SEND_KF_MSG_QUEUE = 'async_send_kf_msg_queue:';
+    const NK_ASYNC_SEND_WX_MSG_QUEUE = 'async_send_wx_msg_queue:';
     const NK_ASYNC_SMS_QUEUE         = 'async_sms_queue:';
     const NK_ASYNC_DB_OPT_QUEUE      = 'async_db_opt_queue:';
     
