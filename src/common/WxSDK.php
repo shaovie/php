@@ -121,8 +121,8 @@ class WxSDK
         Log::warng('weixin - user del access token!');
     }
 
-    // 生成情景二维码 $tmp:true 临时二维码  $tmp:false 永久二维码
-    public static function createSceneQRcode($sceneId, $tmp = true, $expire = 604800)
+    // 生成情景二维码 $tmp:true 临时二维码
+    public static function tmpSceneQRcode($sceneId, $expire = 2592000)
     {
         $ck = Cache::CK_WX_SCENE_QRCODE . $sceneId;
         $result = Cache::get($ck);
@@ -136,7 +136,7 @@ class WxSDK
         $accessToken = self::getAccessToken();
         $url = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=' . $accessToken;
         $data = '{"expire_seconds":' . $expire
-            . ',"action_name":"' . ($tmp ? 'QR_SCENE' : 'QR_LIMIT_SCENE') . '"'
+            . ',"action_name":"QR_SCENE"'
             . ',"action_info":{"scene":{"scene_id":' . $sceneId . '}}';
         $ret = HttpUtil::request($url, $data, array('Content-Type: application/json'));
         if ($ret === false) {
@@ -147,7 +147,7 @@ class WxSDK
             Log::warng('weixin - scene qr-code error: ' . $ret['errmsg'] . ' sceneid=' . $sceneId);
             return false;
         }
-        $ret = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $ret['ticket'];
+        $ret = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . urlencode($ret['ticket']);
         Cache::setex($ck, $cacheExpire, $ret);
         return $ret;
     }
