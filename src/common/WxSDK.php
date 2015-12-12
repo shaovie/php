@@ -295,7 +295,7 @@ class WxSDK
         $signKey,
         $openid,
         $outTradeNo,
-        $body, // 商品或支付单简要描述
+        $body, // 商品或支付单简要描述 (string(32))
         $totalAmount, // 订单总金额（分）
         $clientIp, // 用户端ip
         $notifyUrl,
@@ -310,6 +310,14 @@ class WxSDK
             || empty($clientIp)
             || empty($notifyUrl)) {
             Log::pay('jsapipay error - params error! ' . json_encode(func_get_args()));
+            return false;
+        }
+        if (strlen($body) > 32) {
+            Log::pay('jsapipay error - body out of length limit!');
+            return false;
+        }
+        if (strlen($attach) > 127) {
+            Log::pay('jsapipay error - attach out of length limit!');
             return false;
         }
 
