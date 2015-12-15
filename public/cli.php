@@ -15,9 +15,10 @@ $fp or die('not found ' . $argv[1]);
 while (!feof($fp)) {
     $line = trim(stream_get_line($fp, 1024, PHP_EOL));
     if (strlen($line) > 0 && $line[0] != '#') {
-        $params = preg_split("/[\s;]+/", $line);
-        if (count($params) == 4) {
-            $_SERVER[$params[1]] = $params[2];
+        $line = str_replace(';', '', $line);
+        $params = preg_split("/[\s]+/", $line, 3);
+        if (count($params) == 3) {
+            $_SERVER[$params[1]] = trim($params[2], '"');
         }
     }
 }
