@@ -20,6 +20,7 @@ class Cache
     const CK_SHORT_URL               = 'short_url:';              // forever
     const CK_WX_TMP_SCENE_QRCODE     = 'wx_tmp_scene_qrcode:'; const CK_WX_SCENE_QRCODE_EXPIRE = 3600;
     const CK_WX_USER_INFO            = 'wx_user_info:';
+    const CK_WX_USER_INFO_FOR_UID    = 'wx_user_info_for_uid:';
     const CK_USER_INFO_FOR_PHONE     = 'user_info_for_phone:';
     const CK_USER_INFO_FOR_ID        = 'user_info_for_id:';
 

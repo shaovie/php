@@ -8,11 +8,15 @@ namespace src\user\model;
 
 user \src\common\DB;
 user \src\common\Util;
+user \src\user\model\WxUserModel;
 
 class UserModel
 {
+    const USER_ST_DEFAULT = 0; // 用户初始状态
+
     public static function newUser(
         $phone,
+        $passwd,
         $nickname,
         $sex,
         $headimgurl,
@@ -30,6 +34,7 @@ class UserModel
         }
         $data = array(
             'phone' => $phone,
+            'passwd' => $passwd,
             'nickname' => Util::emojiEncode($nickname),
             'sex' => $sex,
             'headimgurl' => $headimgurl,
@@ -41,7 +46,10 @@ class UserModel
             DB::getDB('w')->rollBack();
             return false;
         }
-        return DB::getDB('w')->commit();
+        if (DB::getDB('w')->commit() === false) {
+            return false;
+        }
+        return true;
     }
 
     public static function findUserById($userId)
@@ -54,7 +62,7 @@ class UserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB()->fetchOne(
+            $ret = DB::getDB('w')->fetchOne(
                 'u_user',
                 array('id'), array($userId),
             );
@@ -79,7 +87,7 @@ class UserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB()->fetchOne(
+            $ret = DB::getDB('w')->fetchOne(
                 'u_user',
                 array('phone'), array($phone),
             );
@@ -92,6 +100,17 @@ class UserModel
         }
         $ret['nickname'] = Util::emojiDecode($ret['nickname']);
         return $ret;
+    }
+
+    //= 业务逻辑
+    public static function onLoginOk($userId, $openid)
+    {
+        Session::setUserSession($userId, $openid);
+    }
+
+    public static function getRandomNickname($prefix)
+    {
+        return $prefix . Util::getRandomStr(5); // TODO
     }
 }
 

@@ -42,7 +42,7 @@ class WxUserModel
     public static function updateWxUserInfo($userInfo, $wxUserInfo, $from)
     {
         $openid = $wxUserInfo['openid'];
-        if (empty($openid) || empty($wxUserInfo) || empty($userInfo)
+        if (empty($openid) || empty($wxUserInfo) || empty($userInfo)) {
             return false;
         }
 
@@ -92,8 +92,34 @@ class WxUserModel
             $data,
             array('openid'), array($openid)
         );
-        Cache::del(Cache::CK_WX_USER_INFO . $openid);
+        self::onUpdateData($openid);
         return $ret !== false;
+    }
+
+    public static function findUserByUserId($userId)
+    {
+        if (empty($userId)) {
+            return array();
+        }
+
+        $ck = Cache::CK_WX_USER_INFO_FOR_UID . $userId;
+        $ret = Cache::get($ck);
+        if ($ret !== false) {
+            $ret = json_decode($ret, true);
+        } else {
+            $ret = DB::getDB('w')->fetchOne(
+                'u_wx_user',
+                array('user_id'), array($userId),
+            );
+            if ($ret !== false) {
+                Cache::set($ck, json_encode($ret));
+            }
+        }
+        if (empty($ret)) {
+            return array();
+        }
+        $ret['nickname'] = Util::emojiDecode($ret['nickname']);
+        return $ret;
     }
 
     public static function findUserByOpenId($openid)
@@ -107,7 +133,7 @@ class WxUserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB()->fetchOne(
+            $ret = DB::getDB('w')->fetchOne(
                 'u_wx_user',
                 array('openid'), array($openid),
             );
@@ -132,7 +158,16 @@ class WxUserModel
             array('atime' => CURRENT_TIME),
             array('openid'), array($openid)
         );
+        self::onUpdateData($openid);
+    }
+
+    private static function onUpdateData($openid)
+    {
+        $data = self::findUserByOpenId($openid);
         Cache::del(Cache::CK_WX_USER_INFO . $openid);
+        if (!empty($data['user_id'])) {
+            Cache::del(Cache::CK_WX_USER_INFO_FOR_UID . $data['user_id']);
+        }
     }
 }
 

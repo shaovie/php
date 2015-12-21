@@ -17,6 +17,13 @@ class SMS
         return mt_rand(1000, 9999);
     }
 
+    public static function isVerifyCode($code)
+    {
+        if (empty($code)) {
+            return false;
+        }
+    }
+
     public static function verifyCode($phone, $code)
     {
         if (empty($phone) || empty($code)) {

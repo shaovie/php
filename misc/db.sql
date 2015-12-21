@@ -4,12 +4,16 @@
 -- bigint
 -- engine=InnoDB  or  engine=MyISAM
 
+-- md5 len = 32
+
 -----------------------------------用户表-----------------------------------
 drop table if exists u_user;
 create table u_user (
     id                  int unsigned not null auto_increment comment 'id',
 
     phone               char(11) not null default '' comment '手机号',
+
+    passwd              char(32) not null default '' comment '密码',
 
     nickname            varchar(255) not null default '' comment '用户昵称',
     sex                 tinyint not null default 0 comment '用户性别 1男,2女,0未知',

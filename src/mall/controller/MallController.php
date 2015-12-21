@@ -16,9 +16,7 @@ class MallController extends UserBaseController
 
         $this->module = 'mall';
 
-        if (!$this->autoLogin()) {
-            $this->toLogin();
-        }
+        $this->autoLogin();
     }
 }
 

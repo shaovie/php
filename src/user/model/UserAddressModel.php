@@ -56,7 +56,7 @@ class UserAddressModel
             return json_decode($ret, true);
         }
 
-        $ret = DB::getDB()->fetchAll(
+        $ret = DB::getDB('w')->fetchAll(
             'u_user_address',
             '*',
             array('user_id'), array($userId),

@@ -23,14 +23,6 @@ class Util
         return $ip;
     }
 
-    public static function isPhone($v)
-    {
-        if (empty($v)) {
-            return false;
-        }
-        return preg_match('/^1[3-8]\d{9}$/', $v);
-    }
-
     public static function getRandomStr($length)
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

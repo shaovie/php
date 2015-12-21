@@ -58,3 +58,10 @@ define('WX_PAY_KEY',            $_SERVER['WX_PAY_KEY']);
 
 //= alipay config
 const ALI_PAY_PARTNER_ID        = '2088411445174760';
+
+//= error code
+const ERR_PARAMS_ERROR          = 101; // 参数错误
+const ERR_OPT_FREQ_LIMIT        = 102; // 操作频率受限
+const ERR_PASSWD_ERROR          = 103; // 密码错误
+const ERR_SYSTEM_ERROR          = 104; // 系统错误
+
