@@ -23,6 +23,8 @@ class Nosql
     const NK_WX_UNIFIED_PAY_UNSUBSCRIBE = 'wx_unified_pay_unsubscribe:';
     const NK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE = 86400;
 
+    const NK_ORDER_ATTACH_INFO       = 'order_attach_info:'; const NK_ORDER_ATTACH_INFO_EXPIRE = 86400;
+
     //= async job queue
     const NK_MONITOR_LOG             = 'monitor_log:';
     const NK_ASYNC_EMAIL_QUEUE       = 'async_email_queue:';

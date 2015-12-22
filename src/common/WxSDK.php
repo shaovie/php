@@ -294,12 +294,11 @@ class WxSDK
         $appId,
         $signKey,
         $openid,
-        $outTradeNo,
+        $outTradeNo, // string(32) 商户订单号
         $body, // 商品或支付单简要描述 (string(32))
         $totalAmount, // 订单总金额（分）
         $clientIp, // 用户端ip
-        $notifyUrl,
-        $attach // String(127) 附加数据
+        $notifyUrl
     ) {
         if (empty($mchid)
             || empty($appId)
@@ -316,14 +315,10 @@ class WxSDK
             Log::pay('jsapipay error - body out of length limit!');
             return false;
         }
-        if (strlen($attach) > 127) {
-            Log::pay('jsapipay error - attach out of length limit!');
-            return false;
-        }
 
         $data = array(
             'appid' => $appId,
-            'attach' => $attach,
+            'attach' => '', // string(127) 附加数据
             'body' => $body,
             'mch_id' => $mchid,
             'nonce_str' => Util::getRandomStr(32),
@@ -483,7 +478,7 @@ class WxSDK
         }
 
         $data = array(
-            'nonce_str' => WxSDK::createNonceStr(32),
+            'nonce_str' => Util::getRandomStr(32),
             'mch_billno' => $mchid . date('Ymd') . mt_rand(1000000000, 1999999999),
             'mch_id' => $mchid,
             'wxappid' => $appId,
