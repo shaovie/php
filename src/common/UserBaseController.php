@@ -109,7 +109,7 @@ class UserBaseController extends BaseController
             if ((int)$wxUserInfo['subscribe'] == 0) {
                 $from = WxUserModel::SUBSCRIBE_FROM_UNSUBSCRIBE;
             }
-            $ret = WxUserModel::newWxUser($wxUserInfo, $from);
+            $ret = WxUserModel::newOne($wxUserInfo, $from);
             if ($ret === false) {
                 // TODO 这里要显示的告诉用户
                 // header('Location: /TODO');

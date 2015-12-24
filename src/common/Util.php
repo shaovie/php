@@ -18,9 +18,15 @@ class Util
     // 获取客户端IP
     public static function getIp()
     {
-        $ip = !empty($_SERVER['HTTP_VIA']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
-        $ip = !empty($ip) ? $ip : $_SERVER['REMOTE_ADDR'];
-        return $ip;
+        $ip = '';
+        if (!empty($_SERVER['HTTP_VIA'])) {
+            if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            }
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+        return !empty($ip) ? $ip : $_SERVER['REMOTE_ADDR'];
     }
 
     public static function getRandomStr($length)

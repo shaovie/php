@@ -30,6 +30,15 @@ class Redis
         }
         return $this->redis->get($key);
     }
+    public function mGet($keys)
+    {
+        if ($this->redis === false) {
+            if ($this->connect() === false) {
+                return false;
+            }
+        }
+        return $this->redis->mGet($key);
+    }
     public function set($key, $v)
     {
         if ($this->redis === false) {
@@ -39,14 +48,14 @@ class Redis
         }
         return $this->redis->set($key, $v);
     }
-    public function setex($key, $expire, $v)
+    public function setEx($key, $expire, $v)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->setex($key, $expire, $v);
+        return $this->redis->setEx($key, $expire, $v);
     }
     public function expire($key, $expire)
     {
@@ -84,59 +93,59 @@ class Redis
         }
         return $this->redis->incr($key);
     }
-    public function lpush($key, $v)
+    public function lPush($key, $v)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->lpush($key, $v);
+        return $this->redis->lPush($key, $v);
     }
-    public function rpush($key, $v)
+    public function rPush($key, $v)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->rpush($key, $v);
+        return $this->redis->rPush($key, $v);
     }
-    public function lpop($key)
+    public function lPop($key)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->lpop($key);
+        return $this->redis->lPop($key);
     }
-    public function ltrim($key, $start, $stop)
+    public function lTrim($key, $start, $stop)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->ltrim($key, $start, $stop);
+        return $this->redis->lTrim($key, $start, $stop);
     }
-    public function lrange($key, $start, $end)
+    public function lRange($key, $start, $end)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->lrange($key, $start, $end);
+        return $this->redis->lRange($key, $start, $end);
     }
-    public function lsize($key)
+    public function lSize($key)
     {
         if ($this->redis === false) {
             if ($this->connect() === false) {
                 return false;
             }
         }
-        return $this->redis->lsize($key);
+        return $this->redis->lSize($key);
     }
 
     //= private methods

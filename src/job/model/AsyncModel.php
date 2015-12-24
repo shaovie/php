@@ -11,10 +11,11 @@ user \src\common\Util;
 
 class AsyncModel
 {
-    const ASYNC_SEND_WX_MSG_QUEUE_SIZE  = 3;
+    // 这个队列Size只能加不能减！！！！
+    const ASYNC_SEND_WX_MSG_QUEUE_SIZE  = 4;
     const ASYNC_SEND_SMS_QUEUE_SIZE     = 2;
     const ASYNC_WX_EVENT_QUEUE_SIZE     = 2;
-    const ASYNC_DB_OPT_QUEUE_SIZE       = 2;
+    const ASYNC_DB_OPT_QUEUE_SIZE       = 3;
 
     public static function monitor($title, $desc)
     {

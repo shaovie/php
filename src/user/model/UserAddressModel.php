@@ -11,14 +11,12 @@ user \src\common\Util;
 
 class UserAddressModel
 {
-    public static function newAddress(
+    public static function newOne(
         $userId,
         $reName,
         $rePhone,
         $addrType,
-        $provinceId,
-        $cityId,
-        $districtId,
+        $cityCode,
         $detailAddr,
         $reIdCard,   // 身份证
         $isDefault
@@ -32,19 +30,22 @@ class UserAddressModel
             're_name' => $reName,
             're_phone' => $rePhone,
             'addr_type' => $addrType,
-            'province_id' => $provinceId,
-            'city_id' => $cityId,
-            'district_id' => $districtId,
+            'city_code' => $cityCode,
             'detail' => $detailAddr,
             're_id_card' => $reIdCard,
             'is_default' => $isDefault,
-            'ctime' => CURRENT_TIME
+            'ctime' => CURRENT_TIME,
+            'mtime' => CURRENT_TIME
         );
-        Cache::del(Cache::CK_USER_ADDR_LIST . $userId);
-        return Db::getDB('w')->insertOne('u_user_address', $data);
+        $ret = Db::getDB('w')->insertOne('u_user_address', $data);
+        if ($ret === false) {
+            return false;
+        }
+        self::onUpdateData($userId);
+        return true;
     }
 
-    public static function getAddrList($userId)
+    public static function getAddrList($userId, $fromDb = 'w')
     {
         if (empty($userId)) {
             return array();
@@ -56,7 +57,7 @@ class UserAddressModel
             return json_decode($ret, true);
         }
 
-        $ret = DB::getDB('w')->fetchAll(
+        $ret = DB::getDB($fromDb)->fetchAll(
             'u_user_address',
             '*',
             array('user_id'), array($userId),
@@ -67,12 +68,12 @@ class UserAddressModel
         return $ret;
     }
 
-    public static function findDefaultAddr($userId)
+    public static function findDefaultAddr($userId, $fromDb = 'w')
     {
         if (empty($userId)) {
             return array();
         }
-        $addrList = self::getAddrList($userId);
+        $addrList = self::getAddrList($userId, $fromDb);
         if (empty($addrList)) {
             return array();
         }
@@ -94,8 +95,17 @@ class UserAddressModel
             array('is_default', 1),
             array('id', 'user_id'), array($addrId, $userId)
         );
+        if ($ret === false) {
+            return false;
+        }
+        self::onUpdateData($userId);
+        return true;
+    }
+
+    private static function onUpdateData($userId)
+    {
         Cache::del(Cache::CK_USER_ADDR_LIST . $userId);
-        return $ret !== false;
+        self::getAddrList($userId, 'w');
     }
 }
 

@@ -78,7 +78,7 @@ class RegisterController extends BaseController
         $passwd = '';
         $sex = 0;
         $headimgurl = '';
-        $ret = UserModel::newUser(
+        $ret = UserModel::newOne(
             $phone,
             $passwd,
             $nickname,

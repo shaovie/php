@@ -70,7 +70,7 @@ class WxEventAsyncController extends JobController
 
         $userInfo = WxUserModel::findUserByOpenId($openid);
         if (empty($userInfo)) {
-            WxUserModel::newWxUser($wxUserInfo, $from);
+            WxUserModel::newOne($wxUserInfo, $from);
         } else {
             WxUserModel::updateWxUserInfo($userInfo, $wxUserInfo, $from);
         }

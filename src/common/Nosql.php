@@ -24,6 +24,7 @@ class Nosql
     const NK_WX_UNIFIED_PAY_UNSUBSCRIBE_EXPIRE = 86400;
 
     const NK_ORDER_ATTACH_INFO       = 'order_attach_info:'; const NK_ORDER_ATTACH_INFO_EXPIRE = 86400;
+    const NK_ORDER_ID_RECORD         = 'order_id_record:'; const NK_ORDER_ID_RECORD_EXPIRE = 86400;
 
     //= async job queue
     const NK_MONITOR_LOG             = 'monitor_log:';
@@ -56,6 +57,14 @@ class Nosql
         }
         return $ret;
     }
+    public static function mGet($key)
+    {
+        $ret = self::getNosql()->mGet($key);
+        if ($ret === false) {
+            return self::getNosql()->Get($key);
+        }
+        return $ret;
+    }
     public static function set($key, $v)
     {
         $ret = self::getNosql()->set($key, $v);
@@ -64,11 +73,11 @@ class Nosql
         }
         return $ret;
     }
-    public static function setex($key, $expire/*sec*/, $v)
+    public static function setEx($key, $expire/*sec*/, $v)
     {
-        $ret = self::getNosql()->setex($key, $expire, $v);
+        $ret = self::getNosql()->setEx($key, $expire, $v);
         if ($ret === false) {
-            return self::getNosql()->setex($key, $expire, $v);
+            return self::getNosql()->setEx($key, $expire, $v);
         }
         return $ret;
     }
@@ -104,51 +113,51 @@ class Nosql
         }
         return $ret;
     }
-    public static function lpush($key, $v)
+    public static function lPush($key, $v)
     {
-        $ret = self::getNosql()->lpush($key, $v);
+        $ret = self::getNosql()->lPush($key, $v);
         if ($ret === false) {
-            return self::getNosql()->lpush($key, $v);
+            return self::getNosql()->lPush($key, $v);
         }
         return $ret;
     }
-    public static function rpush($key, $v)
+    public static function rPush($key, $v)
     {
-        $ret = self::getNosql()->rpush($key, $v);
+        $ret = self::getNosql()->rPush($key, $v);
         if ($ret === false) {
-            return self::getNosql()->rpush($key, $v);
+            return self::getNosql()->rPush($key, $v);
         }
         return $ret;
     }
-    public static function lpop($key)
+    public static function lPop($key)
     {
-        $ret = self::getNosql()->lpop($key);
+        $ret = self::getNosql()->lPop($key);
         if ($ret === false) {
-            return self::getNosql()->lpop($key);
+            return self::getNosql()->lPop($key);
         }
         return $ret;
     }
-    public static function lrange($key, $start, $end)
+    public static function lRange($key, $start, $end)
     {
-        $ret = self::getNosql()->lrange($key, $start, $end);
+        $ret = self::getNosql()->lRange($key, $start, $end);
         if ($ret === false) {
-            return self::getNosql()->lrange($key, $start, $end);
+            return self::getNosql()->lRange($key, $start, $end);
         }
         return $ret;
     }
-    public static function lsize($key)
+    public static function lSize($key)
     {
-        $ret = self::getNosql()->lsize($key);
+        $ret = self::getNosql()->lSize($key);
         if ($ret === false) {
-            return self::getNosql()->lsize($key);
+            return self::getNosql()->lSize($key);
         }
         return $ret;
     }
-    public static function ltrim($key, $start, $stop)
+    public static function lTrim($key, $start, $stop)
     {
-        $ret = self::getNosql()->ltrim($key, $start, $stop);
+        $ret = self::getNosql()->lTrim($key, $start, $stop);
         if ($ret === false) {
-            return self::getNosql()->ltrim($key, $start, $stop);
+            return self::getNosql()->lTrim($key, $start, $stop);
         }
         return $ret;
     }

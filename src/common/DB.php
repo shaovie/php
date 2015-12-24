@@ -190,7 +190,8 @@ class DB
     //       )
     //
     // return affect rows on ok, return false on fail!
-    public function update($tb,
+    public function update(
+        $tb,
         $data,
         $condNames, $condValues,
         $relation = false
@@ -199,6 +200,24 @@ class DB
             return false;
         }
         return $this->_update($tb, $data, $condNames, $condValues, $relation);
+    }
+
+    // delete('tb',
+    //       array('user' => 'cui', 'passwd' => 'shaowei'),
+    //       array('id', 'name'), array(12, 'xyx'),
+    //       array('and')
+    //       )
+    //
+    // return affect rows on ok, return false on fail!
+    public function delete(
+        $tb,
+        $condNames, $condValues,
+        $relation = false
+    ) {
+        if (empty($tb)) {
+            return false;
+        }
+        return $this->_delete($tb, $condNames, $condValues, $relation);
     }
 
     // returns true on success or false on failure
@@ -452,6 +471,54 @@ class DB
                 $sql .= $condName . $opt . ' ?';
                 ++$itor;
             }
+        }
+        $stmt = $this->db->prepare($sql);
+        if ($stmt === false) {
+            $err = $this->db->errorInfo();
+            Log::error('db - prepare sql[' . $sql . '] failure!' . $err[2]);
+            $this->close();
+            return false;
+        }
+        $ret = $stmt->execute(array_merge(array_values($data), $condValues));
+        if ($ret === false) {
+            $err = $stmt->errorInfo();
+            Log::error('db - execute sql[' . $sql . '] failure!' . $err[2]);
+            $this->close();
+            return false;
+        }
+        return $stmt->rowCount();
+    }
+
+    // safety delete
+    private function _delete($table, $condNames, $condValues, $relation)
+    {
+        if (empty($table)
+            || count($condNames) !== count($condValues)
+            || empty($condNames)
+            || (!empty($relation) && (count($condNames) - 1 != count($relation)))
+        ) {
+            Log::error('db - delete params error! ' . json_encode(func_get_args()));
+            return false;
+        }
+
+        if (!$this->db) {
+            if (!$this->connect()) {
+                return false;
+            }
+        }
+
+        $sql = "delete from $table where ";
+        $itor = 0;
+        foreach ($condNames as $condName) {
+            if ($itor > 0) {
+                $sql .= ' ' . (empty($relation) ? 'and' : $relation[$itor - 1]) . ' ';
+            }
+            $opt = '';
+            if (strpbrk($condName, '><!=') === false) {
+                $opt = ' =';
+            }
+            $sql .= $condName . $opt . ' ?';
+            ++$itor;
         }
         $stmt = $this->db->prepare($sql);
         if ($stmt === false) {

@@ -16,7 +16,7 @@ class WxUserModel
     const SUBSCRIBE_FROM_COMMON = 2;
     const SUBSCRIBE_FROM_SCAN_SCENE_CODE = 3;
 
-    public static function newWxUser($wxUserInfo, $from)
+    public static function newOne($wxUserInfo, $from)
     {
         if (empty($wxUserInfo)) {
             return false;
@@ -34,9 +34,15 @@ class WxUserModel
             'subscribe_from' => intval($from),
             'unionid' => isset($wxUserInfo['unionid']) ? $wxUserInfo['unionid'] : '',
             'ctime' => CURRENT_TIME,
+            'mtime' => CURRENT_TIME,
             'atime' => CURRENT_TIME,
         );
-        return DB::getDB('w')->insertOne('u_wx_user', $data);
+        $ret = DB::getDB('w')->insertOne('u_wx_user', $data);
+        if ($ret === false) {
+            return false;
+        }
+        self::findUserByOpenId($wxUserInfo['openid']);
+        return true;
     }
 
     public static function updateWxUserInfo($userInfo, $wxUserInfo, $from)
@@ -96,7 +102,7 @@ class WxUserModel
         return $ret !== false;
     }
 
-    public static function findUserByUserId($userId)
+    public static function findUserByUserId($userId, $fromDb = 'w')
     {
         if (empty($userId)) {
             return array();
@@ -107,8 +113,9 @@ class WxUserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB('w')->fetchOne(
+            $ret = DB::getDB($fromDb)->fetchOne(
                 'u_wx_user',
+                '*',
                 array('user_id'), array($userId),
             );
             if ($ret !== false) {
@@ -122,7 +129,7 @@ class WxUserModel
         return $ret;
     }
 
-    public static function findUserByOpenId($openid)
+    public static function findUserByOpenId($openid, $fromDb = 'w')
     {
         if (empty($openid)) {
             return array();
@@ -133,8 +140,9 @@ class WxUserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB('w')->fetchOne(
+            $ret = DB::getDB($fromDb)->fetchOne(
                 'u_wx_user',
+                '*',
                 array('openid'), array($openid),
             );
             if ($ret !== false) {
@@ -163,10 +171,11 @@ class WxUserModel
 
     private static function onUpdateData($openid)
     {
-        $data = self::findUserByOpenId($openid);
         Cache::del(Cache::CK_WX_USER_INFO . $openid);
+        $data = self::findUserByOpenId($openid, 'w');
         if (!empty($data['user_id'])) {
             Cache::del(Cache::CK_WX_USER_INFO_FOR_UID . $data['user_id']);
+            self::findUserByUserId($data['user_id'], 'w');
         }
     }
 }

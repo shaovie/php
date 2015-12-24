@@ -9,12 +9,13 @@ namespace src\user\model;
 user \src\common\DB;
 user \src\common\Util;
 user \src\user\model\WxUserModel;
+user \src\user\model\UserDetailModel;
 
 class UserModel
 {
     const USER_ST_DEFAULT = 0; // 用户初始状态
 
-    public static function newUser(
+    public static function newOne(
         $phone,
         $passwd,
         $nickname,
@@ -26,7 +27,7 @@ class UserModel
             return false;
         }
         if (!empty($phone)) {
-            $ret = self::findUserByPhone($phone);
+            $ret = self::findUserByPhone($phone, 'w');
             if (!empty($ret)) {
                 DB::getDB('w')->rollBack();
                 return false;
@@ -39,9 +40,15 @@ class UserModel
             'sex' => $sex,
             'headimgurl' => $headimgurl,
             'state' => $state,
-            'ctime' => CURRENT_TIME
+            'ctime' => CURRENT_TIME,
+            'mtime' => CURRENT_TIME
         );
         $ret = Db::getDB('w')->insertOne('u_user', $data);
+        if ($ret === false || (int)$ret <= 0) {
+            DB::getDB('w')->rollBack();
+            return false;
+        }
+        $ret = UserDetailModel::newOne($ret);
         if ($ret === false) {
             DB::getDB('w')->rollBack();
             return false;
@@ -49,10 +56,12 @@ class UserModel
         if (DB::getDB('w')->commit() === false) {
             return false;
         }
+        self::findUserById($ret, 'w');
+        self::findUserByPhone($phone, 'w');
         return true;
     }
 
-    public static function findUserById($userId)
+    public static function findUserById($userId, $fromDb = 'w')
     {
         if (empty($userId)) {
             return array();
@@ -62,8 +71,9 @@ class UserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB('w')->fetchOne(
+            $ret = DB::getDB($fromDb)->fetchOne(
                 'u_user',
+                '*',
                 array('id'), array($userId),
             );
             if ($ret !== false) {
@@ -77,7 +87,7 @@ class UserModel
         return $ret;
     }
 
-    public static function findUserByPhone($phone)
+    public static function findUserByPhone($phone, $fromDb = 'w')
     {
         if (empty($phone)) {
             return array();
@@ -87,8 +97,9 @@ class UserModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB('w')->fetchOne(
+            $ret = DB::getDB($fromDb)->fetchOne(
                 'u_user',
+                '*',
                 array('phone'), array($phone),
             );
             if ($ret !== false) {
