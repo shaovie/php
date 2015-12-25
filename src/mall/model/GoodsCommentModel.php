@@ -76,6 +76,14 @@ class GoodsCommentModel
                 array($size)
             );
         }
+        if (empty($ret)) {
+            return array();
+        }
+        foreach ($ret as &$item) {
+            $item['nickname'] = Util::emojiDecode($item['nickname']);
+            $item['content'] = Util::emojiDecode($item['content']);
+            $item['kf_reply'] = Util::emojiDecode($item['kf_reply']);
+        }
         return empty($ret) ? array() : $ret;
     }
 

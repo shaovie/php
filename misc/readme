@@ -43,3 +43,8 @@ MAY
 
 NOTE
     * 财务要求流水要明晰
+
+REMARK
+    * order_id  订单ID 用户在商城系统下的订单号
+    * trade_no  交易号 用于提交给第三方支付的唯一标识，同一个订单再次支付trade_no会不同
+

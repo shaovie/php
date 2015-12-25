@@ -111,12 +111,11 @@ create table u_user_address (
 
 -----------------------------------商城交易相关-----------------------------------
 -- 订单基础表
-drop table if exists m_order;
-create table m_order (
+drop table if exists u_order;
+create table u_order (
     id                  int unsigned not null auto_increment,
 
     order_id            char(16) not null default '',               # 01 + 150223 + 492933 + 32
-
     user_id             int unsigned not null default 0,
 
     -- 收货信息
@@ -146,6 +145,7 @@ create table m_order (
 
     ctime               int not null default 0,                     # 创建时间
     mtime               int not null default 0,                     # 修改时间
+    m_user              varchar(31) not null default '',            # 修改人
 
     primary key (`id`),
     unique key order_id(`order_id`),
@@ -153,18 +153,19 @@ create table m_order (
 )engine=InnoDB default charset=utf8;
 
 -- 订单商品表
-drop table if exists m_order_goods
-create table m_order_goods (
+drop table if exists u_order_goods
+create table u_order_goods (
     id                  int unsigned not null auto_increment,
 
     order_id            char(16) not null default '',
 
+    -- 商品快照
     goods_id            int unsigned not null default 0,            # 商品ID
     sku_info            varchar(255) not null default '',           # sku 信息json格式{'id':[1,2], 'val':[33,34]}
     amount              int unsigned not null default 0,            # 商品数量
     price               decimal(10,2) not null default 0.0,         # 商品价格
 
-    goods_state         tinyint not null default 0,                 # 0:待发货   1:已出库   2:已发货 3:已收货
+    state               tinyint not null default 0,                 # 0:待发货   1:已出库   2:已发货 3:已收货
                                                                     # 4:申请退货 5:退货成功 6:退货失败
                                                                     # 7:申请换货 8:换货成功 9:换货失败
     commented           tinyint not null default 0,                 # 是否评论过 
@@ -173,14 +174,15 @@ create table m_order_goods (
 
     ctime               int not null default 0,                     # 创建时间
     mtime               int not null default 0,                     # 修改时间
+    m_user              varchar(31) not null default '',            # 修改人
 
     primary key (`id`),
     index idx_order_id(`order_id`)
 }engine=InnoDB default charset=utf8;
 
 -- 购物车表
-drop table if exists m_cart
-create table m_cart (
+drop table if exists u_cart
+create table u_cart (
     id                  int unsigned not null auto_increment,
 
     user_id             int unsigned not null default 0,

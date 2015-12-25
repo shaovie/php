@@ -85,7 +85,7 @@ class OrderModel
             'ctime' => CURRENT_TIME,
             'mtime' => CURRENT_TIME,
         );
-        $ret = Db::getDB('w')->insertOne('m_order', $data);
+        $ret = Db::getDB('w')->insertOne('u_order', $data);
         if ($ret === false) {
             return false;
         }
@@ -104,7 +104,7 @@ class OrderModel
             $ret = json_decode($ret, true);
         } else {
             $ret = DB::getDB($fromDb)->fetchOne(
-                'm_order',
+                'u_order',
                 '*',
                 array('order_id'), array($orderId),
             );

@@ -27,7 +27,7 @@ class CartModel
             'attach'    => $attach,
             'ctime'     => CURRENT_TIME,
         );
-        $ret = Db::getDB('w')->insertOne('m_cart', $data);
+        $ret = Db::getDB('w')->insertOne('u_cart', $data);
         if ($ret === false) {
             return false;
         }
@@ -52,7 +52,7 @@ class CartModel
             $ret = json_decode($ret, true);
         } else {
             $ret = DB::getDB($fromDb)->fetchAll(
-                'm_cart',
+                'u_cart',
                 '*',
                 array('user_id'), array($userId),
             );
@@ -73,7 +73,7 @@ class CartModel
             return false;
         }
         $ret = DB::getDB('w')->delete(
-            'm_cart',
+            'u_cart',
             array('id', 'user_id'), array($cartId, $userId),
             array('and')
         );
