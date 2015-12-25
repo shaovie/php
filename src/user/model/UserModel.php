@@ -20,8 +20,7 @@ class UserModel
         $passwd,
         $nickname,
         $sex,
-        $headimgurl,
-        $state
+        $headimgurl
     ) {
         if (DB::getDB('w')->beginTransaction() === false) {
             return false;
@@ -39,7 +38,7 @@ class UserModel
             'nickname' => Util::emojiEncode($nickname),
             'sex' => $sex,
             'headimgurl' => $headimgurl,
-            'state' => $state,
+            'state' => self::USER_ST_DEFAULT,
             'ctime' => CURRENT_TIME,
             'mtime' => CURRENT_TIME
         );
