@@ -129,7 +129,7 @@ create table m_order (
     detail              varchar(255) not null default '',           # 详细街道地址
     re_id_card          varchar(18) not null default '',            # 收件人身份证
 
-    -- 订单状态
+    -- 状态
     pay_state           tinyint not null default 0,                 # 0:未支付 1:支付中 2:支付成功
     order_state         tinyint not null default 0,                 # 0:创建 1:完成 3:取消 4:超时
 
@@ -291,7 +291,7 @@ create table g_goods_comment (
     image_urls          varchar(2048) not null default '',          # 商品评价图片(json格式)
                                                                     # {"url":["http://xx",""]}
 
-    have_reply          tinyint not null default 0,                 # 是否有回复
+    kf_reply            varchar(1024) not null default '',          # 客服回复
     like_count          int unsigned not null default 0,            # 点赞计数
     state               tinyint not null default 0,                 # 评论状态 0:无效 1:有效
 
@@ -370,11 +370,11 @@ create table s_address_table (
     id                  int unsigned not null auto_increment,
 
     province_id         int not null default 0,                     # 省
-    province_name       varchar(31) not null default '',            # 省名
+    province_name       varchar(60) not null default '',            # 省名
     city_id             int not null default 0,                     # 市
-    city_name           varchar(31) not null default '',            # 市名
+    city_name           varchar(60) not null default '',            # 市名
     district_id         int not null default 0,                     # 区
-    district_name       varchar(31) not null default '',            # 区名
+    district_name       varchar(60) not null default '',            # 区名
 
     ctime               int not null default 0,                     # 创建时间
 

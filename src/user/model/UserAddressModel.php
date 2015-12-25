@@ -16,9 +16,11 @@ class UserAddressModel
         $reName,
         $rePhone,
         $addrType,
-        $cityCode,
+        $provinceId,
+        $cityId,
+        $districtId,
         $detailAddr,
-        $reIdCard,   // 身份证
+        $reIdCard,   // 收货人身份证
         $isDefault
     ) {
         if (empty($userId)) {
@@ -30,7 +32,9 @@ class UserAddressModel
             're_name' => $reName,
             're_phone' => $rePhone,
             'addr_type' => $addrType,
-            'city_code' => $cityCode,
+            'province_id' => $provinceId,
+            'city_id' => $cityId,
+            'district_id' => $districtId,
             'detail' => $detailAddr,
             're_id_card' => $reIdCard,
             'is_default' => $isDefault,
