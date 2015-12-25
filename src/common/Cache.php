@@ -39,6 +39,7 @@ class Cache
     const CK_GOODS_COMMENT_HAD_LIKE  = 'goods_comment_had_like:'; const CK_GOODS_COMMENT_HAD_LIKE_EXPIRE = 86400;
     const CK_GOODS_HAD_COMMENT       = 'goods_had_comment:'; const CK_GOODS_HAD_COMMENT_EXPIRE = 86400;
     const CK_GOODS_INFO              = 'goods_info:'; const CK_GOODS_INFO_EXPIRE = 86400;
+    const CK_GOODS_SKU               = 'goods_sku:'; const CK_GOODS_SKU_EXPIRE = 86400;
 
     const CK_MONITOR_LOG             = 'monitor_log:'; const CK_MONITOR_LOG_EXPIRE = 60;
 
