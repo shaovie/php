@@ -9,6 +9,7 @@ namespace src\mall\model;
 use \src\common\Cache;
 use \src\common\Util;
 use \src\common\Log;
+use \src\common\DB;
 
 class GoodsCommentModel
 {
@@ -42,7 +43,7 @@ class GoodsCommentModel
             'state'     => self::COMMENT_ST_VALID,
             'ctime'     => CURRENT_TIME,
         );
-        $ret = Db::getDB('w')->insertOne('g_goods_comment', $data);
+        $ret = DB::getDB('w')->insertOne('g_goods_comment', $data);
         if ($ret === false) {
             return false;
         }
@@ -87,6 +88,7 @@ class GoodsCommentModel
         return empty($ret) ? array() : $ret;
     }
 
+    // return true or false
     public static function hadCommented($userId, $orderId, $goodsId)
     {
         $ck = Cache::CK_GOODS_HAD_COMMENT . $userId . ':' . $orderId . ':' . $goodsId;

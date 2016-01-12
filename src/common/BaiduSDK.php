@@ -26,7 +26,7 @@ class BaiduSDK
             'coor' => 'bd09ll',
         );
         $uri = '/location/ip';
-        $sn = self::caculateAKSN(self::APPKEY, self::SECURITY_KEY, $uri, $querystringArrays);
+        $sn = self::caculateAKSN(self::SECURITY_KEY, $uri, $querystringArrays);
 
         $url = "http://api.map.baidu.com/location/ip?ak=%s&ip=%s&sn=%s&coor=bd09ll";
         $url = sprintf($url, self::APPKEY, $ip, $sn); 
@@ -66,7 +66,7 @@ class BaiduSDK
             'coordtype' => 'bd09ll'
         );
         $uri = '/geocoder/v2/';
-        $sn = self::caculateAKSN(self::APPKEY, self::SECURITY_KEY, $uri, $querystringArrays);
+        $sn = self::caculateAKSN(self::SECURITY_KEY, $uri, $querystringArrays);
         
         $url = 'http://api.map.baidu.com/geocoder/v2/?ak=%s&location=%s&sn=%s&output=%s&coordtype=%s';
         $url = sprintf($url, self::APPKEY, urlencode($location), $sn, 'json', 'bd09ll');
@@ -133,7 +133,7 @@ class BaiduSDK
             'to' => '5',
         );
         $uri = '/geoconv/v1/';
-        $sn = self::caculateAKSN(self::APPKEY, self::SECURITY_KEY, $uri, $querystringArrays);
+        $sn = self::caculateAKSN(self::SECURITY_KEY, $uri, $querystringArrays);
         
         $url = 'http://api.map.baidu.com/geoconv/v1/?ak=%s&coords=%s&output=%s&from=%s&to=%s&sn=%s';
         $url = sprintf($url, self::APPKEY, urlencode($coords), 'json', '3', '5', $sn);
@@ -154,13 +154,13 @@ class BaiduSDK
     }
 
     //= private methods
-    private static function caculateAKSN($ak, $sk, $uri, $querystringArrays, $method = 'GET')
+    private static function caculateAKSN($sk, $uri, $queryStringArrays, $method = 'GET')
     {  
         if ($method === 'POST') {
-            ksort($querystringArrays);
+            ksort($queryStringArrays);
         }
-        $querystring = http_build_query($querystringArrays);
-        return md5(urlencode($uri . '?' . $querystring . $sk));
+        $queryString = http_build_query($queryStringArrays);
+        return md5(urlencode($uri . '?' . $queryString . $sk));
     }
 
 }

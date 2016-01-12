@@ -15,15 +15,16 @@ use \src\user\model\WxUserModel;
 
 class WxEventAsyncController extends JobController
 {
+    const ASYNC_WX_EVENT_QUEUE_SIZE = 2;
+
     public function send()
     {
-        $this->spawnTask(AsyncModel::ASYNC_WX_EVENT_QUEUE_SIZE);
+        $this->spawnTask(self::ASYNC_WX_EVENT_QUEUE_SIZE);
     }
 
     protected function run($idx)
     {
-        $failMap = array();
-        $nk = Nosql::NK_ASYNC_WX_EVENT_QUEUE . $idx;
+        $nk = Nosql::NK_ASYNC_WX_EVENT_QUEUE;
         $beginTime = time();
 
         do {

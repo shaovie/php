@@ -6,8 +6,8 @@
 
 namespace src\user\model;
 
-user \src\common\DB;
-user \src\common\Util;
+use \src\common\DB;
+use \src\common\Util;
 
 class WxUserModel
 {
@@ -18,7 +18,7 @@ class WxUserModel
 
     public static function newOne($wxUserInfo, $from)
     {
-        if (empty($wxUserInfo)) {
+        if (empty($wxUserInfo['openid'])) {
             return false;
         }
         $data = array(
@@ -96,7 +96,9 @@ class WxUserModel
         $ret = DB::getDB('w')->update(
             'u_wx_user',
             $data,
-            array('openid'), array($openid)
+            array('openid'), array($openid),
+            false,
+            1
         );
         self::onUpdateData($openid);
         return $ret !== false;
@@ -116,7 +118,7 @@ class WxUserModel
             $ret = DB::getDB($fromDb)->fetchOne(
                 'u_wx_user',
                 '*',
-                array('user_id'), array($userId),
+                array('user_id'), array($userId)
             );
             if ($ret !== false) {
                 Cache::set($ck, json_encode($ret));
@@ -143,7 +145,7 @@ class WxUserModel
             $ret = DB::getDB($fromDb)->fetchOne(
                 'u_wx_user',
                 '*',
-                array('openid'), array($openid),
+                array('openid'), array($openid)
             );
             if ($ret !== false) {
                 Cache::set($ck, json_encode($ret));

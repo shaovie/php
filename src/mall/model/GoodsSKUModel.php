@@ -38,6 +38,38 @@ class GoodsSKUModel
         return $ret === false ? array() : $ret;
     }
 
+    public static function getSKUInfo($goodsId, $skuAttr, $skuValue)
+    {
+        $ret = GoodsSKUModel::findAllValidSKUInfo($goodsId);
+        foreach ($ret as $sku) {
+            if ($skuAttr == $sku['sku_attr']
+                && $skuValue == $sku['sku_value']) {
+                return $sku;
+            }
+        }
+        return array();
+    }
+
+    // 检查库存，不用事务!
+    public static function checkInventory(
+        $goodsId,
+        $skuAttr,
+        $skuValue,
+        $amount
+    ) {
+        $allValidSKUInfo = self::findAllValidSKUInfo($goodsId);
+        if (empty($allValidSKUInfo)) {
+            return false;
+        }
+        foreach ($allValidSKUInfo as $sku) {
+            if ($skuAttr == $sku['sku_attr']
+                && $skuValue == $sku['sku_value']) {
+                return $sku['amount'] >= $amount;
+            }
+        }
+        return false;
+    }
+
     // 减库存: return -1 库存不足，return false 系统错误
     public static function reduceInventory($goodsId, $skuAttr, $skuValue, $amount)
     {
@@ -46,9 +78,6 @@ class GoodsSKUModel
             return false;
         }
 
-        if (DB::getDB('w')->beginTransaction() === false) {
-            return false;
-        }
         $sql = "update g_goods_sku set amount = amount - $amount"
             . " where goods_id = $goodsId"
             . " and sku_attr = '$skuAttr'"
@@ -57,11 +86,6 @@ class GoodsSKUModel
             . " and amount >= $amount";
         $ret = DB::getDB('w')->rawExec($sql);
         if ($ret === false) {
-            DB::getDB('w')->rollBack();
-            return false;
-        }
-        if (DB::getDB('w')->commit() === false) {
-            self::onUpdateData($goodsId); // ...
             return false;
         }
         self::onUpdateData($goodsId);
@@ -76,9 +100,6 @@ class GoodsSKUModel
             return false;
         }
 
-        if (DB::getDB('w')->beginTransaction() === false) {
-            return false;
-        }
         $sql = "update g_goods_sku set amount = amount + $amount"
             . " where goods_id = $goodsId"
             . " and sku_attr = '$skuAttr'"
@@ -86,11 +107,6 @@ class GoodsSKUModel
             . " and state = " . self::SKU_ST_VALID;
         $ret = DB::getDB('w')->rawExec($sql);
         if ($ret === false) {
-            DB::getDB('w')->rollBack();
-            return false;
-        }
-        if (DB::getDB('w')->commit() === false) {
-            self::onUpdateData($goodsId); // ...
             return false;
         }
         self::onUpdateData($goodsId);
@@ -103,22 +119,15 @@ class GoodsSKUModel
             return false;
         }
 
-        if (DB::getDB('w')->beginTransaction() === false) {
-            return false;
-        }
         $ret = DB::getDB('w')->update(
-            $sql,
+            'g_goods_sku',
             $data,
             array('goods_id', 'sku_attr', 'sku_value'),
             array($goodsId, $skuAttr, $skuValue),
-            array('and', 'and')
+            array('and', 'and'),
+            1
         );
         if ($ret === false) {
-            DB::getDB('w')->rollBack();
-            return false;
-        }
-        if (DB::getDB('w')->commit() === false) {
-            self::onUpdateData($goodsId); // ...
             return false;
         }
         self::onUpdateData($goodsId);

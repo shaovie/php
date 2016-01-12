@@ -6,8 +6,8 @@
 
 namespace src\user\model;
 
-user \src\common\DB;
-user \src\common\Util;
+use \src\common\DB;
+use \src\common\Util;
 
 class AddressTableModel
 {

@@ -13,7 +13,7 @@ class Nosql
     //= define keys
     // format   name1:[name2:]
     // 缓存KEY的前缀已经在Redis中配置过了，这里就不需要加了
-    const NK_MONITOR_LOG_EXPIRE      = 'monitor_log_expire:'; const NK_MONITOR_LOG_EXPIRE = 1800;
+    const NK_MONITOR_LOG             = 'monitor_log:';        const NK_MONITOR_LOG_EXPIRE = 60;
     const NK_USER_SESSOIN            = 'user_session:';       const NK_USER_SESSOIN_EXPIRE = 2592000;
 
     //= for pay
@@ -25,14 +25,19 @@ class Nosql
 
     const NK_ORDER_ATTACH_INFO       = 'order_attach_info:'; const NK_ORDER_ATTACH_INFO_EXPIRE = 86400;
     const NK_ORDER_ID_RECORD         = 'order_id_record:'; const NK_ORDER_ID_RECORD_EXPIRE = 86400;
+    const NK_ASYNC_ORDER_RESULT      = 'async_order_result:'; const NK_ASYNC_ORDER_RESULT_EXPIRE = 3600;
 
     //= async job queue
-    const NK_MONITOR_LOG             = 'monitor_log:';
     const NK_ASYNC_EMAIL_QUEUE       = 'async_email_queue:';
     const NK_ASYNC_WX_EVENT_QUEUE    = 'async_wx_event_queue:';
     const NK_ASYNC_SEND_WX_MSG_QUEUE = 'async_send_wx_msg_queue:';
+    const NK_ASYNC_TIMEDSEND_WX_MSG_QUEUE = 'async_timedsend_wx_msg_queue:';
     const NK_ASYNC_SMS_QUEUE         = 'async_sms_queue:';
     const NK_ASYNC_DB_OPT_QUEUE      = 'async_db_opt_queue:';
+    const NK_ASYNC_ORDER_QUEUE       = 'async_order_queue:';
+    const NK_ASYNC_ORDER_CANCEL_QUEUE = 'async_order_cancel_queue:';
+    const NK_ASYNC_ORDER_PAY_REMIND_QUEUE = 'async_order_pay_remind_queue:';
+    const NK_ASYNC_CANCEL_ORDER_QUEUE = 'async_cancel_order_queue:';
     
     //= for weixin
     const NK_ACTIVATE_FOR_GZH        = 'activate_for_gzh:'; const NK_ACTIVATE_FOR_GZH_EXPIRE = 120;

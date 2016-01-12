@@ -19,7 +19,7 @@ class GoodsModel
     const GOODS_ST_DOWN_INVALID    = 4;  // 下架-无效
 
     // 商品(外部判断状态)
-    public static function findGoodsById($goodsId)
+    public static function findGoodsById($goodsId, $fromDb = 'w')
     {
         if (empty($goodsId)) {
             return array();
@@ -29,7 +29,7 @@ class GoodsModel
         if ($ret !== false) {
             $ret = json_decode($ret, true);
         } else {
-            $ret = DB::getDB()->fetchOne(
+            $ret = DB::getDB($fromDb)->fetchOne(
                 'g_goods',
                 '*',
                 array('goods_id'), array($goodsId),
@@ -41,40 +41,53 @@ class GoodsModel
         return $ret === false ? array() : $ret;
     }
 
+    public static function goodsName($goodsId)
+    {
+        $goodsInfo = self::findGoodsById($goodsId);
+        return empty($goodsInfo) ? '' : $goodsInfo['name'];
+    }
+
     public static function getSomeGoodsByCategory(
         $goodsId,
         $categoryId,
-        $nextId,
-        $orderBy,
-        $orderType,
+        $page,
         $size
     ) {
         if (empty($goodsId) || empty($categoryId) || $size <= 0) {
             return array();
         }
-        $nextId = (int)$nextId;
-        if ($nextId > 0) {
-            $ret = DB::getDB()->fetchSome(
-                'g_goods',
-                '*',
-                array('goods_id', 'category_id', 'state', 'id<'),
-                array($goodsId, $categoryId, self::GOODS_ST_UP, $nextId),
-                array('and', 'and', 'and'),
-                array($orderBy), array($orderType),
-                array($size)
-            );
-        } else {
-            $ret = DB::getDB()->fetchSome(
-                'g_goods',
-                '*',
-                array('goods_id', 'category_id', 'state'),
-                array($goodsId, $categoryId, self::GOODS_ST_UP),
-                array('and', 'and'),
-                array($orderBy), array($orderType),
-                array($size)
-            );
-        }
+        $page = $page > 0 ? $page - 1 : $page;
+        $ret = DB::getDB()->fetchSome(
+            'g_goods',
+            '*',
+            array('goods_id', 'category_id', 'state'),
+            array($goodsId, $categoryId, self::GOODS_ST_UP),
+            array('and', 'and'),
+            array('sort'), array('desc'),
+            array($page * $size, $size)
+        );
         return empty($ret) ? array() : $ret;
+    }
+    
+    public static function doLikeGoods($goodsId)
+    {
+        if (empty($goodsId)) {
+            return false;
+        }
+
+        $sql = 'update g_goods set like_count = like_count + 1 where goods_id = ' . $goodsId;
+        $ret = DB::getDB('w')->rawExec($sql);
+        if ($ret === false) {
+            return false;
+        }
+        self::onUpdateData($goodsId);
+        return $ret > 0 ? true : false;
+    }
+
+    private static function onUpdateData($goodsId)
+    {
+        Cache::del(Cache::CK_GOODS_INFO . $goodsId);
+        self::findGoodsById($goodsId, 'w');
     }
 }
 

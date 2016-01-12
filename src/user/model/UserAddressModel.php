@@ -6,11 +6,16 @@
 
 namespace src\user\model;
 
-user \src\common\DB;
-user \src\common\Util;
+use \src\common\DB;
+use \src\common\Util;
+use \src\common\Cache;
 
 class UserAddressModel
 {
+    const ADDR_TYPE_UNKNOW  = 0;
+    const ADDR_TYPE_COMPANY = 1;
+    const ADDR_TYPE_FAMILY  = 2;
+
     public static function newOne(
         $userId,
         $reName,
@@ -41,8 +46,27 @@ class UserAddressModel
             'ctime' => CURRENT_TIME,
             'mtime' => CURRENT_TIME
         );
-        $ret = Db::getDB('w')->insertOne('u_user_address', $data);
-        if ($ret === false) {
+        $ret = DB::getDB('w')->insertOne('u_address', $data);
+        if ($ret === false || (int)$ret <= 0) {
+            return false;
+        }
+        self::onUpdateData($userId);
+        return true;
+    }
+
+    public static function update($userId, $addrId, $data)
+    {
+        if (empty($userId) || empty($addrId)) {
+            return false;
+        }
+        $ret = DB::getDB('w')->update(
+            'u_address',
+            $data,
+            array('id', 'user_id'), array($addrId, $userId),
+            array('and'),
+            1
+        );
+        if ($ret === false) || (int)$ret <= 0) {
             return false;
         }
         self::onUpdateData($userId);
@@ -62,14 +86,29 @@ class UserAddressModel
         }
 
         $ret = DB::getDB($fromDb)->fetchAll(
-            'u_user_address',
+            'u_address',
             '*',
-            array('user_id'), array($userId),
+            array('user_id'), array($userId)
         );
         if ($ret !== false) {
             Cache::set($ck, json_encode($ret));
+        } else {
+            return array();
         }
         return $ret;
+    }
+
+    public static function getAddr($userId, $addrId)
+    {
+        $addrList = self::getAddrList($userId);
+        if ($addrList !== false) {
+            foreach ($addrList as $addr) {
+                if ($addr['id'] == $addrId) {
+                    return $addr;
+                }
+            }
+        }
+        return array();
     }
 
     public static function findDefaultAddr($userId, $fromDb = 'w')
@@ -89,21 +128,50 @@ class UserAddressModel
         return $addr[0];
     }
 
-    public static function setDefaultAddr($userId, $addrId)
+    public static function setDefaultAddr($userId, $addrId, $val = 1)
     {
         if (empty($userId) || empty($addrId)) {
             return false;
         }
         $ret = DB::getDB('w')->update(
-            'u_user_address',
-            array('is_default', 1),
-            array('id', 'user_id'), array($addrId, $userId)
+            'u_address',
+            array('is_default', $val),
+            array('id', 'user_id'), array($addrId, $userId),
+            array('and'),
+            1
         );
-        if ($ret === false) {
+        if ($ret === false) || (int)$ret <= 0) {
             return false;
         }
         self::onUpdateData($userId);
         return true;
+    }
+
+    public static function delOne($userId, $addrId)
+    {
+        if (empty($userId) || empty($addrId)) {
+            return false;
+        }
+        $ret = DB::getDB('w')->delete(
+            'u_address',
+            array('id', 'user_id'), array($addrId, $userId),
+            array('and'),
+            1
+        );
+        if ($ret === false) || (int)$ret <= 0) {
+            return false;
+        }
+        self::onUpdateData($userId);
+        return true;
+    }
+
+    public static function clearDefaultAddr($userId)
+    {
+        $addr = self::findDefaultAddr($userId);
+        if (empty($addr)) {
+            return ;
+        }
+        self::setDefaultAddr($userId, $addr['id'], 0);
     }
 
     private static function onUpdateData($userId)

@@ -9,8 +9,8 @@ namespace src\pay\model;
 class PayModel
 {
     // 支付方式
-    const PAY_TYPE_WX    = 1; // 微信
-    const PAY_TYPE_ALI   = 2; // 支付宝
+    const PAY_TYPE_ALI   = 1; // 支付宝
+    const PAY_TYPE_WX    = 2; // 微信
 
     // 支付状态
     const PAY_ST_UNPAY   = 0; // 未支付

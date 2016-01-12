@@ -22,7 +22,15 @@ class UserBaseController extends BaseController
         parent::__construct();
     }
 
-    public function autoLogin()
+    public function userId()
+    {
+        if (empty($this->userInfo)) {
+            return 0;
+        }
+        return (int)$this->userInfo['id'];
+    }
+
+    public function doLogin()
     {
         $key = Session::getSid('user');
         $userInfo = Nosql::get(Nosql::NK_USER_SESSOIN . $key);
@@ -33,29 +41,49 @@ class UserBaseController extends BaseController
             }
             $userInfo = json_decode($userInfo, true);
             if ($userInfo['userAgent'] == $userAgent) {
-                if (Util::inWx()) {
-                    $this->doLoginInWx($userInfo['openid']);
+                if (Util::inWeixin()) {
+                    return $this->doLoginInWx($userInfo['openid']);
                 } else {
-                    $this->doLoginDefault($userInfo['userId']);
+                    return $this->doLoginDefault($userInfo['userId']);
                 }
             }
-        } else {
+            return false;
+        }
+        return -1;
+    }
+
+    public function autoLogin()
+    {
+        if ($this->doLogin() === -1) {
             $this->toLogin();
         }
     }
 
     public function toLogin()
     {
-        if (Util::inWx()) {
+        if (Util::inWeixin()) {
             $this->toWxLogin();
         } else {
             $this->toDefaultLogin();
         }
     }
 
+    public function checkLoginAndNotice()
+    {
+        if (!$this->hadLogin()) {
+            if ($this->isAjax()) {
+                $this->ajaxReturn(ERR_NOT_LOGIN, '您未登录或未注册');
+            } else {
+                header('Location: /'); // TODO
+            }
+            exit();
+        }
+        return true;
+    }
+
     public function hadLogin()
     {
-        return empty($this->userInfo['id']);
+        return $this->userId() > 0;
     }
 
     private function doLoginInWx($openid)

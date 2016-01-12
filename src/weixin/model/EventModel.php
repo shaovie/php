@@ -6,9 +6,9 @@
 
 namespace src\weixin\model;
 
-user \src\common\WxSDK;
-user \src\user\model\WxUserModel;
-user \src\job\model\AsyncModel;
+use \src\common\WxSDK;
+use \src\user\model\WxUserModel;
+use \src\job\model\AsyncModel;
 
 class EventModel
 {

@@ -14,7 +14,6 @@ class SendMailController extends JobController
 {
     public function send()
     {
-        $failMap = array();
         $nk = Nosql::NK_ASYNC_EMAIL_QUEUE;
         $beginTime = time();
 
@@ -28,16 +27,11 @@ class SendMailController extends JobController
                 $data = json_decode($rawMsg, true);
                 $ret = SendMail::sendmail($data['toList'], $data['title'], $data['desc']);
                 if ($ret === false) {
-                    $failKey = $data['mailid'];
-                    if (isset($failMap[$failKey])) {
-                        if ($failMap[$failKey] > 2) {
-                            continue ; // drop it
-                        }
-                        $failMap[$failKey] = $failMap[$failKey] + 1;
-                        Nosql::lPush($nk, $rawMsg);
+                    if (isset($data['retry'])) {
+                        continue ; // drop it
                     } else {
-                        $failMap[$failKey] = 1;
-                        Nosql::lPush($nk, $rawMsg);
+                        $data['retry'] = 1;
+                        Nosql::lPush($nk, json_encode($data));
                     }
                 }
             } while (true);

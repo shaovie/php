@@ -18,11 +18,11 @@ class WxSDK
                 || $_SERVER['SERVER_PORT'] == 443) ? 'https://' : 'http://';
             $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         }
-        $nonceStr = Util::getRandomStr(16);
 
+        $nonceStr = Util::getRandomStr(16);
         // 这里参数的顺序要按照 key 值 ASCII 码升序排序
         $string = 'jsapi_ticket=' . $jsApiTicket
-            . '&noncestr=' . $nonceNtr
+            . '&noncestr=' . $nonceStr
             . '&timestamp=' . CURRENT_TIME
             . '&url=' . $url;
         $signature = sha1($string);
@@ -124,13 +124,13 @@ class WxSDK
     // 生成情景二维码 $tmp:true 临时二维码
     public static function tmpSceneQRcode($sceneId, $expire = 2592000)
     {
-        $ck = Cache::CK_WX_SCENE_QRCODE . $sceneId;
+        $ck = Cache::CK_WX_TMP_SCENE_QRCODE . $sceneId;
         $result = Cache::get($ck);
         if ($result !== false) {
             return $result;
         }
-        $cacheExpire = Cache::CK_WX_SCENE_QRCODE_EXPIRE;
-        if ($expire < Cache::CK_WX_SCENE_QRCODE_EXPIRE) {
+        $cacheExpire = Cache::CK_WX_TMP_SCENE_QRCODE_EXPIRE;
+        if ($expire < Cache::CK_WX_TMP_SCENE_QRCODE_EXPIRE) {
             $cacheExpire = $expire;
         }
         $accessToken = self::getAccessToken();
@@ -282,7 +282,7 @@ class WxSDK
         }
         $ret = json_decode($ret, true);
         if (!empty($ret['errcode'])) {
-            Log::warng('weixin - create menu error: ' . $ret['errmsg'] . ' msg=' . $msg);
+            Log::warng('weixin - create menu error: ' . $ret['errmsg']);
             return false;
         }
         return true;
@@ -495,9 +495,9 @@ class WxSDK
 
         $data['sign'] = self::sign($data, $signKey);
 
-        $postXml = self::arrayToXml($data, true);
+        $postXml = Util::arrayToXml($data);
 
-        $responseXml = self::postSSL(
+        $responseXml = HttpUtil::postSSL(
             'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack',
             $postXml,
             $apiClientCertPem,
@@ -572,9 +572,9 @@ class WxSDK
 
         $data['sign'] = self::sign($data, $signKey);
 
-        $postXml = self::arrayToXml($data, false);
+        $postXml = Util::arrayToXml($data);
 
-        $responseXml = Util::postSSL(
+        $responseXml = HttpUtil::postSSL(
             'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers',
             $postXml,
             $apiClientCertPem,

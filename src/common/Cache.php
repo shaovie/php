@@ -18,7 +18,7 @@ class Cache
     const CK_WX_ACCESS_TOKEN         = 'wx_access_token:';        // expire probably 7200-300
     const CK_WX_JSAPI_TICKET         = 'wx_jsapi_ticket:';        // expire probably 7200-300
     const CK_SHORT_URL               = 'short_url:';              // forever
-    const CK_WX_TMP_SCENE_QRCODE     = 'wx_tmp_scene_qrcode:'; const CK_WX_SCENE_QRCODE_EXPIRE = 3600;
+    const CK_WX_TMP_SCENE_QRCODE     = 'wx_tmp_scene_qrcode:'; const CK_WX_TMP_SCENE_QRCODE_EXPIRE = 3600;
 
     //= for baidu
     const CK_BAIDU_IP_TO_LOCATION    = 'baidu_ip2location:';     // forever
@@ -39,9 +39,10 @@ class Cache
     const CK_GOODS_COMMENT_HAD_LIKE  = 'goods_comment_had_like:'; const CK_GOODS_COMMENT_HAD_LIKE_EXPIRE = 86400;
     const CK_GOODS_HAD_COMMENT       = 'goods_had_comment:'; const CK_GOODS_HAD_COMMENT_EXPIRE = 86400;
     const CK_GOODS_INFO              = 'goods_info:'; const CK_GOODS_INFO_EXPIRE = 86400;
+    const CK_GOODS_DETAIL_INFO       = 'goods_detail_info:'; const CK_GOODS_DETAIL_INFO_EXPIRE = 86400;
     const CK_GOODS_SKU               = 'goods_sku:'; const CK_GOODS_SKU_EXPIRE = 86400;
-
-    const CK_MONITOR_LOG             = 'monitor_log:'; const CK_MONITOR_LOG_EXPIRE = 60;
+    const CK_COUPON_CFG_INFO         = 'coupon_cfg_info:'; const CK_COUPON_CFG_INFO_EXPIRE = 86400;
+    const CK_COUPON_CFG_LIST_INFO    = 'coupon_cfg_list_info:'; const CK_COUPON_CFG_INFO_LIST_EXPIRE = 86400;
 
     //= public static methods
     //

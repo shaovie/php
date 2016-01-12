@@ -22,7 +22,7 @@ set_exception_handler(function ($e) {
 // example: '/module/class/function?p1=v1&p2=v2
 $uri = explode('?', $_SERVER['REQUEST_URI']);
 $uri = explode('/', $uri[0]);
-$module = empty($uri[1]) ? 'Admin'  : $uri[1];
+$module = empty($uri[1]) ? 'mall'  : $uri[1];
 $cls    = empty($uri[2]) ? 'Home'   : $uri[2];
 $func   = empty($uri[3]) ? 'index'  : $uri[3];
 

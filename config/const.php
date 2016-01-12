@@ -64,4 +64,7 @@ const ERR_PARAMS_ERROR          = 101; // 参数错误
 const ERR_OPT_FREQ_LIMIT        = 102; // 操作频率受限
 const ERR_PASSWD_ERROR          = 103; // 密码错误
 const ERR_SYSTEM_ERROR          = 104; // 系统错误
+const ERR_SYSTEM_BUSY           = 105; // 系统繁忙
+const ERR_OPT_FAIL              = 106; // 操作失败
+const ERR_NOT_LOGIN             = 107; // 未登录或未注册
 

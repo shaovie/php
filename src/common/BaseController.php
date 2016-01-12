@@ -32,6 +32,14 @@ class BaseController
         return isset($_POST[$key]) ? $_POST[$key] : $defaultVal;
     }
 
+    protected function isAjax()
+    {
+        if (isset($_GET['tjzAjax']) || isset($_POST['tjzAjax'])) {
+            return true;
+        }
+        return false;
+    }
+
     // 模板引用模块
     final public function display($tplName, $data = array(), $isAbsPath = false)
     {

@@ -15,7 +15,7 @@ class DB
     private $passwd  = '';
 
     //= static methods
-    public static function get($db = 'r')
+    public static function getDB($db = 'r')
     {
         static $rdb = false;
         static $wdb = false;
@@ -194,12 +194,13 @@ class DB
         $tb,
         $data,
         $condNames, $condValues,
-        $relation = false
+        $relation = false,
+        $limit = false
     ) {
         if (empty($tb) || empty($data)) {
             return false;
         }
-        return $this->_update($tb, $data, $condNames, $condValues, $relation);
+        return $this->_update($tb, $data, $condNames, $condValues, $relation, $limit);
     }
 
     // delete('tb',
@@ -212,12 +213,13 @@ class DB
     public function delete(
         $tb,
         $condNames, $condValues,
-        $relation = false
+        $relation = false,
+        $limit = false
     ) {
         if (empty($tb)) {
             return false;
         }
-        return $this->_delete($tb, $condNames, $condValues, $relation);
+        return $this->_delete($tb, $condNames, $condValues, $relation, $limit);
     }
 
     // returns true on success or false on failure
@@ -429,7 +431,7 @@ class DB
     }
 
     // safety update
-    private function _update($table, $data, $condNames, $condValues, $relation)
+    private function _update($table, $data, $condNames, $condValues, $relation, $limit)
     {
         if (empty($table)
             || empty($data)
@@ -472,6 +474,9 @@ class DB
                 ++$itor;
             }
         }
+        if (!empty($limit)) {
+            $sql .= ' limit ' . $limit;
+        }
         $stmt = $this->db->prepare($sql);
         if ($stmt === false) {
             $err = $this->db->errorInfo();
@@ -490,7 +495,7 @@ class DB
     }
 
     // safety delete
-    private function _delete($table, $condNames, $condValues, $relation)
+    private function _delete($table, $condNames, $condValues, $relation, $limit)
     {
         if (empty($table)
             || count($condNames) !== count($condValues)
@@ -520,6 +525,9 @@ class DB
             $sql .= $condName . $opt . ' ?';
             ++$itor;
         }
+        if (!empty($limit)) {
+            $sql .= ' limit ' . $limit;
+        }
         $stmt = $this->db->prepare($sql);
         if ($stmt === false) {
             $err = $this->db->errorInfo();
@@ -527,7 +535,7 @@ class DB
             $this->close();
             return false;
         }
-        $ret = $stmt->execute(array_merge(array_values($data), $condValues));
+        $ret = $stmt->execute($condValues);
         if ($ret === false) {
             $err = $stmt->errorInfo();
             Log::error('db - execute sql[' . $sql . '] failure!' . $err[2]);

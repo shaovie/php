@@ -57,8 +57,8 @@ class GzhEventController extends WeiXinController
         case 'shortvideo':
         case 'location':
         case 'link':
-            EventModel::onActivateForGZH($openid);
-            $this->transferToCustomerService($postObj);
+            EventModel::onActivateForGZH($postData['FromUserName']);
+            $this->transferToCustomerService($postData);
             break;
         }
         exit();
@@ -84,7 +84,7 @@ class GzhEventController extends WeiXinController
 
     private function handleText($postData)
     {
-        EventModel::onActivateForGZH($openid);
+        EventModel::onActivateForGZH($postData['FromUserName']);
         return EventModel::onText($openid, $postData['Content']);
     }
 
@@ -143,10 +143,10 @@ class GzhEventController extends WeiXinController
         $toUserName = $postData['ToUserName'];
         $fromUserName = $postData['FromUserName'];
         $now = CURRENT_TIME;
-        $msg = "<xml><ToUserName><![CDATA[$fromUserName]]></ToUserName>" 
-            . "<FromUserName><![CDATA[$toUserName]]></FromUserName>"
-            . "<CreateTime>$now</CreateTime>"
-            . "<MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>";
+        $msg = '<xml><ToUserName><![CDATA[' . $fromUserName . ']]></ToUserName>'
+            . '<FromUserName><![CDATA[' . $toUserName . ']]></FromUserName>'
+            . '<CreateTime>' . $now . '</CreateTime>'
+            . '<MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>';
         echo $msg;
         exit();
     }

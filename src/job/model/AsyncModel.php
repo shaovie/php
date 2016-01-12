@@ -4,35 +4,29 @@
  * @Date   2015-11-30
  */
 
-namespace src\user\model;
+namespace src\job\model;
 
-user \src\common\Nosql;
-user \src\common\Util;
+use \src\common\Nosql;
+use \src\common\Util;
 
 class AsyncModel
 {
-    // 这个队列Size只能加不能减！！！！
-    const ASYNC_SEND_WX_MSG_QUEUE_SIZE  = 4;
-    const ASYNC_SEND_SMS_QUEUE_SIZE     = 2;
-    const ASYNC_WX_EVENT_QUEUE_SIZE     = 2;
-    const ASYNC_DB_OPT_QUEUE_SIZE       = 3;
-
     public static function monitor($title, $desc)
     {
         if (EDITION != 'online') {
             return ;
         }
-        $nk  = Cache::CK_MONITOR_LOG . $title . ':' . $desc;
-        $ret = Cache::get($nk);
+        $nk  = Nosql::NK_MONITOR_LOG . $title . ':' . $desc;
+        $ret = Nosql::get($nk);
         if ($ret !== false) {
             return ;
         }
-        Cache::setex($nk, Cache::CK_MONITOR_LOG_EXPIRE, 'x');
+        Nosql::setex($nk, Nosql::NK_MONITOR_LOG_EXPIRE, 'x');
 
         $nk = Nosql::NK_ASYNC_EMAIL_QUEUE;
         $data = array(
             'toList' => array(
-                'xxx@xx.com',
+                'xxx@xx.com', // TODO
             ),
             'title'  => $title,
             'desc'   => $desc,
@@ -41,51 +35,58 @@ class AsyncModel
         Nosql::rPush($nk, json_encode($data));
     }
 
-    public static function asyncSendTplMsg($openid, $msg)
+    // 马上发送 pushTime = 0，否则置成绝对时间
+    public static function asyncSendTplMsg($openid, $msg, $pushTime)
     {
         if (empty($openid) || empty($msg)) {
             return ;
         }
         $data = array(
             'msgtype' => 'tpl',
-            'msgid' => Util::getRandomStr(16),
+            'msgid' => $openid . Util::getRandomStr(6),
+            'pushTime' => $pushTime
             'data' => $msg,
         );
-        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE
-            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_WX_MSG_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE;
+        if ($pushTime > 0) {
+            $nk = Nosql::NK_ASYNC_TIMEDSEND_WX_MSG_QUEUE;
+        }
         Nosql::rPush($nk, json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
-    public static function asyncSendKfMsg($openid, $msgtype, $content)
+    // 马上发送 pushTime = 0，否则置成绝对时间
+    public static function asyncSendKfMsg($openid, $msgtype, $content, $pushTime)
     {
         if (empty($openid)) {
             return ;
         }
         $data = array(
             'msgtype' => 'kf',
-            'msgid' => Util::getRandomStr(16),
+            'msgid' => $openid . Util::getRandomStr(6),
+            'pushTime' => $pushTime,
             'data' => array(
                 'openid' => $openid,
                 'msgtype' => $msgtype,
                 'content' => $content,
             ),
         );
-        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE
-            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_SEND_WX_MSG_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE;
+        if ($pushTime > 0) {
+            $nk = Nosql::NK_ASYNC_TIMEDSEND_WX_MSG_QUEUE;
+        }
         Nosql::rPush($nk, json_encode($data));
     }
 
-    public static function asyncSendSms($phone, $content)
+    public static function asyncSendSMS($phone, $content)
     {
         if (empty($phone)) {
             return ;
         }
         $data = array(
             'phone'   => $phone,
-            'content' => $desc,
+            'content' => $content,
         );
-        $nk = Nosql::NK_ASYNC_SMS_QUEUE
-            . (abs(Util::ascIIStrToInt($phone)) % ASYNC_SEND_SMS_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_SMS_QUEUE;
         Nosql::rPush($nk, json_encode($data));
     }
 
@@ -97,8 +98,7 @@ class AsyncModel
             'openid' => $openid,
             'from' => $from,
         );
-        $nk = Nosql::NK_ASYNC_WX_EVENT_QUEUE
-            . (abs(Util::ascIIStrToInt($openid)) % ASYNC_WX_EVENT_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_WX_EVENT_QUEUE;
         Nosql::rPush($nk, json_encode($data));
     }
 
@@ -108,9 +108,45 @@ class AsyncModel
             'opt' => $opt,
             'data' => $data,
         );
-        $nk = Nosql::NK_ASYNC_DB_OPT_QUEUE
-            . (abs(Util::ascIIStrToInt($opt)) % ASYNC_DB_OPT_QUEUE_SIZE) . ':';
+        $nk = Nosql::NK_ASYNC_DB_OPT_QUEUE;
         Nosql::rPush($nk, json_encode($data));
+    }
+
+    public static function asyncCreateOrder($userId, $orderType, $data)
+    {
+        $data = array(
+            'userId' => $userId,
+            'orderType' => $orderType,
+            'data' => $data,
+        );
+        $nk = Nosql::NK_ASYNC_ORDER_QUEUE;
+        Nosql::rPush($nk, json_encode($data));
+    }
+
+    public static function asyncOrderPayRemind($orderId)
+    {
+        $data = array(
+            'orderId' => $orderId,
+            'ctime' => CURRENT_TIME,
+        );
+        $nk = Nosql::NK_ASYNC_ORDER_PAY_REMIND_QUEUE;
+        Nosql::rPush($nk, json_encode($data));
+    }
+
+    public static function asyncCancelOrder($orderId, $duration)
+    {
+        $data = array(
+            'orderId' => $orderId,
+            'ctime' => CURRENT_TIME,
+        );
+        $nk = Nosql::NK_ASYNC_CANCEL_ORDER_QUEUE;
+        Nosql::rPush($nk, json_encode($data));
+    }
+
+    public static function orderQueueSize()
+    {
+        $ret = Nosql::lSize(Nosql::NK_ASYNC_ORDER_QUEUE);
+        return (int)$ret;
     }
 }
 

@@ -30,11 +30,11 @@ class SMS
             return false;
         }
         $content = '您的验证码为：' . $code . '，有效期30分钟。非本人操作请忽略该信息';
-        AsyncModel::asyncSendSms($phone, $content);
+        AsyncModel::asyncSendSMS($phone, $content);
     }
 
     // ensms
-    private static function secondSend($smsPhones, $smsContent)
+    public static function secondSend($smsPhones, $smsContent)
     {
         $smsUser    = urlencode('xxxx'); // TODO
         $smsPasswd  = urlencode('xxx');  // TODO
@@ -112,7 +112,7 @@ class SMS
     }
 
     // ctysms
-    private static function secondSend($smsPhones, $smsContent)
+    public static function firstSend($smsPhones, $smsContent)
     {
         $url = 'http://si.800617.com:4400/SendSms.aspx?un=xxx&pwd=xxx' // TODO
             . '&mobile=' . $smsPhones

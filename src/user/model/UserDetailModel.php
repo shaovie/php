@@ -6,8 +6,8 @@
 
 namespace src\user\model;
 
-user \src\common\DB;
-user \src\common\Util;
+use \src\common\DB;
+use \src\common\Util;
 
 class UserDetailModel
 {
@@ -15,10 +15,11 @@ class UserDetailModel
     {
         $data = array(
             'user_id' => $userId,
+            'score' => 0,
             'ctime' => CURRENT_TIME,
             'mtime' => CURRENT_TIME
         );
-        $ret = Db::getDB('w')->insertOne('u_user_detail', $data);
+        $ret = DB::getDB('w')->insertOne('u_user_detail', $data);
         if ($ret === false || (int)$ret <= 0) {
             return false;
         }
@@ -39,7 +40,7 @@ class UserDetailModel
             $ret = DB::getDB($fromDb)->fetchOne(
                 'u_user_detail',
                 '*',
-                array('user_id'), array($userId),
+                array('user_id'), array($userId)
             );
             if ($ret !== false) {
                 Cache::set($ck, json_encode($ret));

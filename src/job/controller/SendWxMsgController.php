@@ -13,15 +13,44 @@ use \src\job\model\AsyncModel;
 
 class SendWxMsgController extends JobController
 {
+    const ASYNC_SEND_WX_MSG_QUEUE_SIZE = 4;
+
+    // 即时发送
     public function send()
     {
-        $this->spawnTask(AsyncModel::ASYNC_SEND_WX_MSG_QUEUE_SIZE);
+        $this->spawnTask(self::ASYNC_SEND_WX_MSG_QUEUE_SIZE);
+    }
+
+    // 定时发送
+    public function timedSend()
+    {
+        $nk = Nosql::NK_ASYNC_TIMEDSEND_WX_MSG_QUEUE;
+        $beginTime = time();
+
+        do {
+            $now = time();
+            do {
+                $rawMsg = Nosql::lPop($nk);
+                if ($rawMsg === false
+                    || !isset($rawMsg[0])) {
+                    break ;
+                }
+                $data = json_decode($rawMsg, true);
+                if ($now > $data['time']) {
+                    Nosql::rPush(Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE, $rawMsg);
+                }
+            } while (true);
+
+            if ($now - $beginTime > 30) { // 30秒脚本重新执行一次
+                break;
+            }
+            sleep(1);
+        } while (true);
     }
 
     protected function run($idx)
     {
-        $failMap = array();
-        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE . $idx;
+        $nk = Nosql::NK_ASYNC_SEND_WX_MSG_QUEUE;
         $beginTime = time();
 
         do {
@@ -34,16 +63,11 @@ class SendWxMsgController extends JobController
                 $data = json_decode($rawMsg, true);
                 $ret = $this->processMsg($data);
                 if ($ret === false) {
-                    $failKey = $data['msgid'];
-                    if (isset($failMap[$failKey])) {
-                        if ($failMap[$failKey] > 2) {
-                            continue ; // drop it
-                        }
-                        $failMap[$failKey] = $failMap[$failKey] + 1;
-                        Nosql::lPush($nk, $rawMsg);
+                    if (isset($data['retry'])) {
+                        continue ; // drop it
                     } else {
-                        $failMap[$failKey] = 1;
-                        Nosql::lPush($nk, $rawMsg);
+                        $data['retry'] = 1;
+                        Nosql::lPush($nk, json_encode($data));
                     }
                 }
             } while (true);

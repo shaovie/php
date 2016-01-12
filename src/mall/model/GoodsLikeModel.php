@@ -8,6 +8,7 @@ namespace src\mall\model;
 
 use \src\common\Cache;
 use \src\common\Log;
+use \src\common\DB;
 
 class GoodsLikeModel
 {
@@ -23,7 +24,7 @@ class GoodsLikeModel
             'user_id'   => $userId,
             'ctime'     => CURRENT_TIME,
         );
-        $ret = Db::getDB('w')->insertOne('g_goods_like', $data);
+        $ret = DB::getDB('w')->insertOne('g_goods_like', $data);
         if ($ret === false) {
             return false;
         }
@@ -32,6 +33,7 @@ class GoodsLikeModel
         return true;
     }
 
+    // return true or false
     public static function hadLiked($userId, $goodsId)
     {
         $ck = Cache::CK_GOODS_HAD_LIKE . $goodsId . ':' . $userId;

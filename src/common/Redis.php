@@ -37,7 +37,7 @@ class Redis
                 return false;
             }
         }
-        return $this->redis->mGet($key);
+        return $this->redis->mGet($keys);
     }
     public function set($key, $v)
     {

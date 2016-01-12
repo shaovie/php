@@ -6,20 +6,23 @@
 
 namespace src\mall\controller;
 
+use \src\common\Check;
+use \src\mall\model\CartModel;
+use \src\mall\model\GoodsSKUModel;
+use \src\user\model\UserCartModel;
+
 class CartController extends MallController
 {
-    // 加入购物车
-    public function add()
+    public function __construct()
     {
-    }
+        parent::__construct();
 
-    // 删除商品
-    public function del()
-    {
+        $this->checkLoginAndNotice();
     }
 
     public function index()
     {
+        $cartList = CartModel::getCartList($this->userId());
         $this->display('');
     }
 }

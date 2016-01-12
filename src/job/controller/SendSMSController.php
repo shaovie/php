@@ -12,15 +12,16 @@ use \src\common\Log;
 
 class SendSMSController extends JobController
 {
+    const ASYNC_SEND_SMS_QUEUE_SIZE = 2;
 
     public function send()
     {
-        $this->spawnTask(AsyncModel::ASYNC_SEND_SMS_QUEUE_SIZE);
+        $this->spawnTask(self::ASYNC_SEND_SMS_QUEUE_SIZE);
     }
 
     protected function run($idx)
     {
-        $nk = Nosql::NK_ASYNC_SMS_QUEUE . $idx;
+        $nk = Nosql::NK_ASYNC_SMS_QUEUE;
         $beginTime = time();
 
         do {

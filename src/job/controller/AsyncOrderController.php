@@ -7,24 +7,22 @@
 namespace src\job\controller;
 
 use \src\common\Nosql;
-use \src\common\WxSDK;
 use \src\common\Log;
 use \src\job\model\AsyncModel;
-use \src\user\model\WxUserModel;
-use \src\user\model\UserOrderModel;
+use \src\mall\model\OrderModel;
 
-class AsyncDBOptController extends JobController
+class AsyncOrderController extends JobController
 {
-    const ASYNC_ORDER_QUEUE_SIZE = 3;
+    const ASYNC_ORDER_QUEUE_SIZE = 5;
 
-    public function send()
+    public function createOrder()
     {
-        $this->spawnTask(self::ASYNC_DB_OPT_QUEUE_SIZE);
+        $this->spawnTask(self::ASYNC_ORDER_QUEUE_SIZE);
     }
 
     protected function run($idx)
     {
-        $nk = Nosql::NK_ASYNC_DB_OPT_QUEUE;
+        $nk = Nosql::NK_ASYNC_ORDER_QUEUE;
         $beginTime = time();
 
         do {
@@ -47,12 +45,26 @@ class AsyncDBOptController extends JobController
 
     private function doOpt($data)
     {
-        switch ($data['opt']) {
-        case 'activate_for_gzh':
-            WxUserModel::onActivateForGZH($data['data']['openid']);
+        switch ($data['orderType']) {
+        case UserOrderModel::ORDER_PRE_COMMON:
+            $this->commenOrder($data['data']);
             break;
         default:
             Log::error('wx event async job: unknow event');
+        }
+    }
+
+    private function commenOrder($data)
+    {
+        $nk = Nosql::NK_ASYNC_ORDER_RESULT . $data['token'];
+        $result = OrderModel::doCreateOrder(
+            $data['userId'],
+            $data['orderPrefix'],
+            // TODO
+        );
+        Nosql::setex($nk, Nosql::NK_ASYNC_ORDER_RESULT_EXPIRE, json_encode($result));
+        if ($result['code'] == 0) {
+            AsyncModel::asyncCancelOrder($result['result']['orderId'], 1800); // 普通订单超时时间1800秒
         }
     }
 }
