@@ -27,6 +27,10 @@ class OrderController extends ApiController
             UserOrderModel::ORDER_PRE_COMMON,
             $this->userId()
         );
+        if ($result['code'] != 0) {
+            $this->ajaxReturn($result['code'], $result['desc']);
+            return ;
+        }
         $this->ajaxReturn(0, '', '', array('token' => $result['result']['token']));
     }
 

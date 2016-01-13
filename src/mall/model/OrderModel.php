@@ -31,6 +31,18 @@ class OrderModel
         $userId
     ) {
         $optResult = array('code' => ERR_SYSTEM_ERROR, 'desc' => '', 'result' => array());
+        $nk = Nosql::NK_LIMIT_ORDER_FREQ . $userId;
+        $ret = Nosql::setNx($nk, 'x');
+        if ($ret === true) {
+            Nosql::expire($nk, Nosql::NK_LIMIT_ORDER_FREQ_EXPIRE);
+        } else {
+            $ret = Nosql::get($nk);
+            if ($ret !== false) { // redis服务器挂了
+                $optResult['code'] = ERR_OPT_FREQ_LIMIT;
+                $optResult['desc'] = '请不要重复提交订单...';
+                return $optResult;
+            }
+        }
         $size = AsyncModel::orderQueueSize();
         if ($size > self::MAX_ORDER_QUEUE_SIZE) {
             $optResult['code'] = ERR_SYSTEM_BUSY;
