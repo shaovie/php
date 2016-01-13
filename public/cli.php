@@ -18,7 +18,7 @@ while (!feof($fp)) {
         $line = str_replace(';', '', $line);
         $params = preg_split("/[\s]+/", $line, 3);
         if (count($params) == 3) {
-            $_SERVER[$params[1]] = trim($params[2], '"');
+            $_SERVER[$params[1]] = trim($params[2], "\"'");
         }
     }
 }
