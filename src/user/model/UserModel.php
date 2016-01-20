@@ -158,8 +158,10 @@ class UserModel
 
     private static function onUpdateData($userId)
     {
+        Cache::del(Cache::CK_USER_INFO_FOR_ID. $userId);
         $userInfo = self::findUserById($userId, 'w');
         if (!empty($userInfo['phone'])) {
+            Cache::del(Cache::CK_USER_INFO_FOR_PHONE . $userInfo['phone']);
             self::findUserByPhone($userInfo['phone'], 'w');
         }
     }

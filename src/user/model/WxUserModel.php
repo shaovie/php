@@ -41,7 +41,7 @@ class WxUserModel
         if ($ret === false) {
             return false;
         }
-        self::findUserByOpenId($wxUserInfo['openid']);
+        self::updateWxUserInfo($wxUserInfo['openid']);
         return true;
     }
 

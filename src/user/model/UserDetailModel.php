@@ -51,5 +51,11 @@ class UserDetailModel
         }
         return $ret;
     }
+
+    private static function onUpdateData($userId)
+    {
+        Cache::del(Cache::CK_USER_DETAIL_INFO . $userId);
+        self::findUserDetailById($userId, 'w');
+    }
 }
 

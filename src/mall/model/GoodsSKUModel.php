@@ -137,8 +137,7 @@ class GoodsSKUModel
     //= private methods
     private static function onUpdateData($goodsId)
     {
-        $ck = Cache::CK_GOODS_SKU . $goodsId;
-        Cache::del($ck);
+        Cache::del(Cache::CK_GOODS_SKU . $goodsId);
     }
 }
 
