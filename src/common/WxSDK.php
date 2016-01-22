@@ -364,7 +364,7 @@ class WxSDK
         $data = array(
             'appId' => $appId,
             'nonceStr' => Util::getRandomStr(32),
-            'timeStamp' => CURRENT_TIME,
+            'timeStamp' => (string)CURRENT_TIME,
             'package' => 'prepay_id=' . $ret['prepay_id'],
             'signType' => 'MD5',
         );
