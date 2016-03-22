@@ -381,7 +381,10 @@ class WxSDK
         $outTradeNo,
         $outRefundNo,
         $totalAmount,  // 订单总金额（分）
-        $refundAmount  // 退款总金额（分）
+        $refundAmount, // 退款总金额（分）
+        $apiClientCertPem,
+        $apiClientKeyPem,
+        $rootcaPem
     ) {
         if (empty($mchid)
             || empty($appId)
@@ -390,7 +393,11 @@ class WxSDK
             || empty($outTradeNo)
             || empty($outRefundNo)
             || empty($totalAmount)
-            || empty($refundAmount)) {
+            || empty($refundAmount)
+            || empty($apiClientCertPem)
+            || empty($apiClientKeyPem)
+            || empty($rootcaPem)
+        ) {
             Log::pay('jsapipay error - params error! ' . json_encode(func_get_args()));
             return false;
         }
@@ -411,11 +418,13 @@ class WxSDK
 
         $postXml = Util::arrayToXml($data);
 
-        $responseXml = HttpUtil::request(
+        $responseXml = HttpUtil::postSSL(
             'https://api.mch.weixin.qq.com/secapi/pay/refund',
             $postXml,
-            false,
-            5);
+            $apiClientCertPem,
+            $apiClientKeyPem,
+            $rootcaPem
+        );
         if ($responseXml === false) {
             Log::pay('weixin refund error - request fail or timeout! '
                 . json_encode(func_get_args(), JSON_UNESCAPED_UNICODE));

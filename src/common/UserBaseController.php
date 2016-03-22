@@ -40,12 +40,13 @@ class UserBaseController extends BaseController
                 $userAgent = $_SERVER['HTTP_USER_AGENT'];
             }
             $userInfo = json_decode($userInfo, true);
-            if ($userInfo['userAgent'] == $userAgent) {
-                if (Util::inWeixin()) {
-                    return $this->doLoginInWx($userInfo['openid']);
-                } else {
-                    return $this->doLoginDefault($userInfo['userId']);
-                }
+            if ($userInfo['userAgent'] != $userAgent) {
+                return false;
+            }
+            if (Util::inWeixin()) {
+                return $this->doLoginInWx($userInfo['openid']);
+            } else {
+                return $this->doLoginDefault($userInfo['userId']);
             }
             return false;
         }
@@ -62,7 +63,16 @@ class UserBaseController extends BaseController
     public function toLogin()
     {
         if (Util::inWeixin()) {
-            $this->toWxLogin();
+            $openid = $this->toWxLogin();
+            if ($openid !== false) {
+                if ($this->doLoginInWx($openid) === true) {
+                    UserModel::onLoginOk(0, $openid);
+                } else {
+                    //
+                }
+            } else {
+                // 
+            }
         } else {
             $this->toDefaultLogin();
         }
@@ -90,7 +100,6 @@ class UserBaseController extends BaseController
     {
         $this->wxUserInfo = WxUserModel::findUserByOpenId($openid);
         if (!empty($this->wxUserInfo)) {
-            UserModel::onLoginOk($this->wxUserInfo['user_id'], $openid);
             $this->userInfo = UserModel::findUserById($this->wxUserInfo['user_id']);
             return true;
         }
@@ -101,7 +110,6 @@ class UserBaseController extends BaseController
     {
         $this->userInfo = UserModel::findUserById($userId);
         if (!empty($this->userInfo)) {
-            UserModel::onLoginOk($this->userInfo['user_id'], '');
             return true;
         }
         return false;
@@ -114,7 +122,7 @@ class UserBaseController extends BaseController
             // TODO 这里要显示的告诉用户
             // header('Location: /TODO');
             // exit(0);
-            return ;
+            return false;
         }
         $wxUserInfo = WxSDK::getUserInfo($openInfo['openid'], 'snsapi_base');
         if (empty($wxUserInfo)) { //
@@ -125,14 +133,11 @@ class UserBaseController extends BaseController
                 // TODO 这里要显示的告诉用户
                 // header('Location: /TODO');
                 // exit(0);
-                return ;
+                return false;
             }
         }
-        $ret = WxUserModel::findUserByOpenId($openInfo['openid']);
-        if (!empty($ret)) {
-            $this->doLoginInWx($openInfo['openid']);
-            return ;
-        } else { // create one
+        $wxDBUserInfo = WxUserModel::findUserByOpenId($openInfo['openid']);
+        if (empty($wxDBUserInfo)) { // new one
             $from = WxUserModel::SUBSCRIBE_FROM_ALREADY;
             if ((int)$wxUserInfo['subscribe'] == 0) {
                 $from = WxUserModel::SUBSCRIBE_FROM_UNSUBSCRIBE;
@@ -142,17 +147,10 @@ class UserBaseController extends BaseController
                 // TODO 这里要显示的告诉用户
                 // header('Location: /TODO');
                 // exit(0);
-                return ;
-            }
-
-            $ret = $this->doLoginInWx($openInfo['openid']);
-            if ($ret === false) {
-                Log::error("create wx user fail! " . json_encode($wxUserInfo, JSON_UNESCAPED_UNICODE));
-                // TODO 这里要显示的告诉用户
-                // header('Location: /TODO');
-                // exit(0);
+                return false;
             }
         }
+        return $openInfo['openid'];
     }
 
     private function toDefaultLogin()

@@ -59,7 +59,7 @@ class PayController extends BaseController
     }
 
     // 微信支付完成返回的页面
-    public function wxPayReturn()
+    protected function wxPayReturn()
     {
         $orderId = $this->getParam('orderId', '');
         if (empty($orderId)) {
@@ -73,7 +73,7 @@ class PayController extends BaseController
         $this->display('wxpay_return');
     }
 
-    public function aliPay($orderId, $orderDesc, $totalAmount)
+    protected function aliPay($orderId, $orderDesc, $totalAmount)
     {
         PayModel::onCreateOrderOk(
             $orderId,
